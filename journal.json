@@ -1,0 +1,36 @@
+[
+    {
+      "Id": 1,
+      "idAirbus": "Airbius_A319",
+      "route": {
+        "pointOfDeparture": "Florida",
+        "pointOfArrival": "OMSK"
+      },
+      "departure": "Oct 11, 2019, 11:23:00 AM",
+      "travelTime": 50,
+      "changes": false
+    },
+    {
+      "Id": 2,
+      "idAirbus": "Airbius_A300",
+      "route": {
+        "pointOfDeparture": "NewYork",
+        "pointOfArrival": "York"
+      },
+      "departure": "Sep 21, 2019, 11:23:00 AM",
+      "travelTime": 45,
+      "changes": false
+    },
+    {
+      "Id": 3,
+      "idAirbus": "boing_757",
+      "route": {
+        "pointOfDeparture": "OMSK",
+        "pointOfArrival": "OMSK"
+      },
+      "departure": "Dec 11, 2019, 11:23:00 AM",
+      "travelTime": 70,
+      "changes": false
+    }
+  ]
+}

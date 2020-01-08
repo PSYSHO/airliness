@@ -1,0 +1,7 @@
+.idea/
+airlines.iml
+.out
+# Project exclude paths
+/client/target/
+/common/target/
+/server/target/
