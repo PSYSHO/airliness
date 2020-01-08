@@ -1,9 +1,5 @@
 package general;
 
-import com.sun.corba.se.spi.ior.Writeable;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.beans.value.WritableValue;
 
 import java.util.Date;
 
@@ -13,6 +9,7 @@ public class Flight implements Comparable<Flight> {
     private Route route;
     private Date departure;
     private  int travelTimeMinutes;
+    private boolean variability = false;
 
 
 
@@ -30,6 +27,18 @@ public class Flight implements Comparable<Flight> {
         this.route = route;
         this.departure = departure;
         this.travelTimeMinutes = travelTimeMinutes;
+    }
+
+    public boolean isVariability() {
+        return variability;
+    }
+
+    public boolean isVariabilitytrue() {
+        return variability = true;
+    }
+
+    public boolean isVariabilityfalse() {
+        return variability = false;
     }
 
     public int getId() {

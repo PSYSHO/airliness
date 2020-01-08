@@ -2,6 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import general.AirFlight;
 import general.Flight;
 import general.Route;
 import gsonConverter.CustomConverter;
@@ -11,13 +12,16 @@ import request.GeneralRequest;
 import request.Request;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.net.Socket;
+import java.util.Collections;
 
 public class AirLinesServer implements ControlInterface {
+    int i = 0;
     public int pos;
     private  static Socket  Dialog;
-    public Flight journal;
-    public Flight secondJournal;
+    public AirFlight journal;
+    public AirFlight secondJournal;
 
     public  static String path = "journal.json";
     public AirLinesServer(){}
@@ -25,22 +29,22 @@ public class AirLinesServer implements ControlInterface {
         AirLinesServer.Dialog = client;
     }
 
-    public Flight load(String path,Flight flight){
+    public AirFlight load(String path, AirFlight airflight){
          Gson gson = new Gson();
         try {
             FileReader fileReader = new FileReader(path);
-            flight = gson.fromJson(fileReader , Flight.class);
+            airflight = gson.fromJson(fileReader , (Type) Flight.class);
             fileReader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return flight;
+        return airflight;
     }
-    public void save(String path,Flight flight){
+    public void save(String path, AirFlight airflight){
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try {
             FileWriter fileWriter = new FileWriter(path);
-            fileWriter.write(gson.toJson(flight));
+            fileWriter.write(gson.toJson(airflight));
             fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -80,12 +84,33 @@ public class AirLinesServer implements ControlInterface {
                         System.out.println("Сервер отправи журнал");
                         break;
                     case "removeFlight":
+                        i = request.getIndex();
+                        journal.remove(i);
                         save(path, journal);
+                        getFlight = new Gson().toJson(journal);
+                        out.writeUTF(getFlight);
+                        out.flush();
                         break;
                     case"addFlight":
-                        in.readUTF();
-                        journal = (Flight)request.getObject();
+                        Flight flight = (Flight) request.getObject();
+                        journal.add(flight);
                         save(path,journal);
+                        break;
+                    case "EditFlight":
+                        Flight flightEdit=(Flight)request.getObject();
+                        int indexEdit=request.getIndex();
+                        i = flightEdit.getId();
+                        if(journal.busy(i)==false){
+                            journal.getFlight(i).isVariabilitytrue();
+                        journal.refactor(i,flightEdit);
+                        Collections.sort(journal.getJournal());
+                        save(path,journal);
+                        getFlight = new Gson().toJson(journal);
+                        out.writeUTF(getFlight);
+                        out.flush();}
+                        else out.writeUTF("Обьект занят");
+                        out.flush();
+                        break;
                     case"quit":
                         in.close();
                         out.close();
@@ -109,7 +134,7 @@ public class AirLinesServer implements ControlInterface {
         return  jsonRequest;
     }
     //todo при добавлении перелета сделать обработку по Id
-    // hashmap добавить для хранения перелетов
+    // hashmap добавить для хранения перелетов -
     // сделать поиск элементов
     // блокировка элемента который используется
     // сервер перед тем как клиент редактирует принимает id

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class AirFlight {
+    boolean tip = false ;
     List journal = new ArrayList<Flight>();
 
     public AirFlight(){}
@@ -19,6 +20,10 @@ public class AirFlight {
 
     public List<Flight> getJournal() {
         return journal;
+    }
+    public Flight getFlight(int i){
+       Flight flight = (Flight) journal.get(i);
+       return flight;
     }
 
     public void setJournal(ArrayList<Flight> journal) {
@@ -35,6 +40,18 @@ public class AirFlight {
 
     public void removeAll(ArrayList<Flight> flights) {
         journal.addAll(flights);
+    }
+
+    public void remove(int i) {
+        journal.remove(i);
+    }
+    public void refactor(int i,Flight flight){
+        journal.set(i, flight);
+    }
+    public boolean busy(int i ){
+       Flight flight = (Flight) journal.get(i);
+       if (tip == flight.isVariability());
+       return true;
     }
 
 }
