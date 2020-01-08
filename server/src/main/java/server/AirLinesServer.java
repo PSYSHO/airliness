@@ -4,11 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import general.Flight;
 import general.Route;
-import util.gsonConverter.CustomConverter;
-import util.gsonConverter.CustomConverterFlight;
-import util.gsonConverter.CustomConverterRoute;
-import util.request.GeneralRequest;
-import util.request.Request;
+import gsonConverter.CustomConverter;
+import gsonConverter.CustomConverterFlight;
+import gsonConverter.CustomConverterRoute;
+import request.GeneralRequest;
+import request.Request;
 
 import java.io.*;
 import java.net.Socket;
@@ -100,12 +100,12 @@ public class AirLinesServer implements ControlInterface {
     public String listUpdate() {
         String jsonRequest = null;
     GeneralRequest generalRequest = null;
-        try {
+       /* try {
             jsonRequest =  generalRequest.receivingRequest("updatejournal",secondJournal);
         return  jsonRequest;
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
         return  jsonRequest;
     }
     //todo при добавлении перелета сделать обработку по Id
