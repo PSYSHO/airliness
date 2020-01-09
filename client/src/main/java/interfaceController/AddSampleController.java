@@ -1,4 +1,4 @@
-package sample.interfaceController;
+package interfaceController;
 
 import general.Airbus;
 import general.Flight;
@@ -17,10 +17,6 @@ import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 import sun.util.calendar.LocalGregorianCalendar;
 
-import javax.swing.text.StringContent;
-import javax.xml.soap.Node;
-import java.awt.*;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;

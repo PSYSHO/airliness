@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class AirFlight {
+    int size;
     boolean tip = false ;
     List journal = new ArrayList<Flight>();
 
@@ -12,6 +13,7 @@ public class AirFlight {
 
     public AirFlight(List journal) {
         this.journal=journal;
+        this.size = journal.size();
     }
 
     public AirFlight(ArrayList<Flight> flights) {
@@ -53,5 +55,6 @@ public class AirFlight {
        if (tip == flight.isVariability());
        return true;
     }
+    public int getSize(){return journal.size();}
 
 }

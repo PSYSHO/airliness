@@ -14,12 +14,14 @@ import request.Request;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.net.Socket;
-import java.util.Collections;
+import java.util.HashMap;
 
 public class AirLinesServer implements ControlInterface {
     int i = 0;
     public int pos;
     private  static Socket  Dialog;
+    private HashMap flightHashMap = new HashMap();
+    private HashMap updateFlight = new HashMap();
     public AirFlight journal;
     public AirFlight secondJournal;
 
@@ -29,7 +31,7 @@ public class AirLinesServer implements ControlInterface {
         AirLinesServer.Dialog = client;
     }
 
-    public AirFlight load(String path, AirFlight airflight){
+    public HashMap load(String path, AirFlight airflight,HashMap hashMap){
          Gson gson = new Gson();
         try {
             FileReader fileReader = new FileReader(path);
@@ -38,9 +40,18 @@ public class AirLinesServer implements ControlInterface {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return airflight;
+        for(int i =0;i>=airflight.getSize();i++){
+            int id = airflight.getFlight(i).getId();
+            Flight flight = airflight.getFlight(i);
+            hashMap.put(id,flight);
+        }
+        return hashMap;
     }
-    public void save(String path, AirFlight airflight){
+    public void save(String path, HashMap hashMap){
+        AirFlight airflight = new AirFlight();
+        for (Object flight: hashMap.values()){
+            airflight.add((Flight) flight);
+        }
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try {
             FileWriter fileWriter = new FileWriter(path);
@@ -54,7 +65,7 @@ public class AirLinesServer implements ControlInterface {
     @Override
     public void run() {
         try {
-            load(path,journal);
+            load(path,journal,flightHashMap);
             String json ="";
             String getFlight;
             DataOutputStream out = new DataOutputStream(Dialog.getOutputStream());
@@ -68,9 +79,9 @@ public class AirLinesServer implements ControlInterface {
                     .registerTypeAdapter(Route.class, new CustomConverterRoute())
                     .create();
             while (!Dialog.isClosed()){
-                load(path,secondJournal);
-                if (secondJournal.equals(journal)){
-                    journal = secondJournal;
+                load(path,secondJournal,updateFlight);
+                if (updateFlight.equals(flightHashMap)){
+                    flightHashMap = updateFlight;
                     out.writeUTF(listUpdate());
                     out.flush();
                 }
@@ -85,16 +96,19 @@ public class AirLinesServer implements ControlInterface {
                         break;
                     case "removeFlight":
                         i = request.getIndex();
-                        journal.remove(i);
-                        save(path, journal);
+                        flightHashMap.remove(i);
+                        save(path, flightHashMap);
+                        load(path,journal,flightHashMap);
                         getFlight = new Gson().toJson(journal);
                         out.writeUTF(getFlight);
                         out.flush();
                         break;
                     case"addFlight":
                         Flight flight = (Flight) request.getObject();
-                        journal.add(flight);
-                        save(path,journal);
+                        //journal.add(flight);
+                        flightHashMap.put(flight.getId(),flight);
+                        save(path,flightHashMap);
+                        load(path,journal,flightHashMap);
                         break;
                     case "EditFlight":
                         Flight flightEdit=(Flight)request.getObject();
@@ -103,8 +117,9 @@ public class AirLinesServer implements ControlInterface {
                         if(journal.busy(i)==false){
                             journal.getFlight(i).isVariabilitytrue();
                         journal.refactor(i,flightEdit);
-                        Collections.sort(journal.getJournal());
-                        save(path,journal);
+                        flightHashMap.replace(i,journal.getFlight(i));
+                        save(path,flightHashMap);
+                        load(path,journal,flightHashMap);
                         getFlight = new Gson().toJson(journal);
                         out.writeUTF(getFlight);
                         out.flush();}
@@ -125,17 +140,16 @@ public class AirLinesServer implements ControlInterface {
     public String listUpdate() {
         String jsonRequest = null;
     GeneralRequest generalRequest = null;
-       /* try {
+        try {
             jsonRequest =  generalRequest.receivingRequest("updatejournal",secondJournal);
         return  jsonRequest;
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
+        }
         return  jsonRequest;
     }
     //todo при добавлении перелета сделать обработку по Id
     // hashmap добавить для хранения перелетов -
-    // сделать поиск элементов
     // блокировка элемента который используется
     // сервер перед тем как клиент редактирует принимает id
 }

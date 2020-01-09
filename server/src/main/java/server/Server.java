@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class Server {
     public static void main(String[] args) {
-        int port = 6666;
+        int port = 8000;
         List fly = new ArrayList<ControlInterface>();
         try (ServerSocket server = new ServerSocket(port)
         ) {

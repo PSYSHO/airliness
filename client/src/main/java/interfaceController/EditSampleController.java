@@ -1,4 +1,4 @@
-package sample.interfaceController;
+package interfaceController;
 
 import general.Airbus;
 import general.Flight;

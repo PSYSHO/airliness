@@ -12,7 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import sample.interfaceController.MainSceneController;
+import interfaceController.MainSceneController;
 
 import java.io.IOException;
 import java.net.ConnectException;

@@ -6,6 +6,7 @@ import general.Route;
 import gsonConverter.CustomConverter;
 import gsonConverter.CustomConverterFlight;
 import gsonConverter.CustomConverterRoute;
+import interfaceController.MainSceneController;
 import request.GeneralRequest;
 import request.Request;
 
@@ -17,7 +18,7 @@ import java.lang.reflect.Type;
 import java.net.Socket;
 
 import com.google.gson.*;
-import sample.interfaceController.MainSceneController;
+import interfaceController.MainSceneController;
 
 import java.util.ArrayList;
 

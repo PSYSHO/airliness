@@ -1,8 +1,20 @@
 package request;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import general.AirFlight;
 import general.Flight;
+import general.Route;
+import gsonConverter.CustomConverter;
+import gsonConverter.CustomConverterFlight;
+import gsonConverter.CustomConverterRoute;
+
+import java.io.IOException;
 
 public class GeneralRequest implements Request {
+    Request request;
+    Gson gson;
+    String jsonRequest;
     /**
      * Поле сообщения запроса
      */
@@ -24,7 +36,15 @@ public class GeneralRequest implements Request {
         this.index=index;
     }
 
-    public GeneralRequest(){}
+    public GeneralRequest(String message, AirFlight obj){}
+    public GeneralRequest(String message, Flight obj) {
+        this.message = message;
+        this.object = obj;
+    }
+
+    public GeneralRequest() {
+
+    }
 
     /**
      * Сообщение запроса
@@ -82,5 +102,16 @@ public class GeneralRequest implements Request {
     @Override
     public void setIndex(int index) {
         this.index=index;
+    }
+    public String receivingRequest(String message, AirFlight obj) throws IOException {
+        request=new GeneralRequest(message,obj);
+        gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .registerTypeAdapter(GeneralRequest.class, new CustomConverter())
+                .registerTypeAdapter(Flight.class, new CustomConverterFlight())
+                .registerTypeAdapter(Route.class, new CustomConverterRoute())
+                .create();
+        jsonRequest=gson.toJson(request);
+        return jsonRequest;
     }
 }
