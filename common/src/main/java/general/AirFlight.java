@@ -56,5 +56,5 @@ public class AirFlight {
        return true;
     }
     public int getSize(){return journal.size();}
-
+    //todo HashMap вместо List
 }

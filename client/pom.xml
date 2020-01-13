@@ -8,9 +8,23 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>11</maven.compiler.release>
+        <javafx.version>13</javafx.version>
+    </properties>
     <artifactId>client</artifactId>
     <dependencies>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.example</groupId>
             <artifactId>common</artifactId>
@@ -18,6 +32,80 @@
             <scope>compile</scope>
         </dependency>
     </dependencies>
-
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <release>${maven.compiler.release}</release>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.3</version>
+                <configuration>
+                    <mainClass>org.openjfx.App</mainClass>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                <outputDirectory>${project.build.directory}</outputDirectory>
+                <owerWriteReleases>true</owerWriteReleases>
+                <owerWriteSnapshots> true</owerWriteSnapshots>
+                <owerWriteIfNewer>true</owerWriteIfNewer>
+                <executions>
+                    <id>copy-dependencies</id>
+                    <phase>package</phase>
+                        <goals>copy-dependencies</goals>
+                    </executions>
+                </configuration>
+            </plugin>
+            <!--<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib</classpathPrefix>
+                            <classpathLayout>simple</classpathLayout>
+                            <mainclass>sample.Main</mainclass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>!-->
+            <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>2.6</version>
+            <configuration>
+                <archive>
+                    <manifest>
+                        <mainClass>sample.Main</mainClass>
+                    </manifest>
+                </archive>
+                <descriptorRefs>
+                    <descriptorRef>jar-with-dependencies</descriptorRef>
+                </descriptorRefs>
+            </configuration>
+            <executions>
+                <execution>
+                    <id>make-assembly</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>single</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+        </plugins>
+    </build>
 </project>

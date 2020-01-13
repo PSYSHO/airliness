@@ -88,13 +88,13 @@ public class AirLinesServer implements ControlInterface {
                 json = in.readUTF();
                 Request request =gson.fromJson(json,GeneralRequest.class);
                 switch(request.getMessage()) {
-                    case "getflight":
+                    case "Get Flights":
                         getFlight = new Gson().toJson(journal);
                         out.writeUTF(getFlight);
                         out.flush();
                         System.out.println("Сервер отправи журнал");
                         break;
-                    case "removeFlight":
+                    case "Delete Flight":
                         i = request.getIndex();
                         flightHashMap.remove(i);
                         save(path, flightHashMap);
@@ -103,14 +103,14 @@ public class AirLinesServer implements ControlInterface {
                         out.writeUTF(getFlight);
                         out.flush();
                         break;
-                    case"addFlight":
+                    case"Add Flight":
                         Flight flight = (Flight) request.getObject();
                         //journal.add(flight);
                         flightHashMap.put(flight.getId(),flight);
                         save(path,flightHashMap);
                         load(path,journal,flightHashMap);
                         break;
-                    case "EditFlight":
+                    case "Edit Flight":
                         Flight flightEdit=(Flight)request.getObject();
                         int indexEdit=request.getIndex();
                         i = flightEdit.getId();

@@ -18,7 +18,6 @@ import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
-import static com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type.Node;
 
 public class AddSampleController {
     private DateTimeFormatter formatter;
