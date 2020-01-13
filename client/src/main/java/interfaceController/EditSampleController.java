@@ -1,8 +1,9 @@
-package interfaceController;
+package sample.interfaceController;
 
 import general.Airbus;
 import general.Flight;
 import general.Route;
+import general.TravelCities;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -14,6 +15,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -27,7 +29,7 @@ public class EditSampleController {
     private DatePicker datePicker;
 
     @FXML
-    private TextField id;
+    private Label id;
 
     @FXML
     private ComboBox<Airbus> comboAirbus;
@@ -39,11 +41,18 @@ public class EditSampleController {
     private TextField travelTimeMinutes;
 
     @FXML
-    private TextField from;
+    private ComboBox<String> from;
 
     @FXML
-    private TextField to;
+    private ComboBox<String> to;
 
+    private ArrayList<String> getMasNameTown(){
+        ArrayList<String> masNameTown=new ArrayList<String>();
+        for(TravelCities element: TravelCities.values()){
+            masNameTown.add(element.getNameTown());
+        }
+        return masNameTown;
+    }
     /**
      * Инициализирует ComboBox элементами типа Airbus,
      * инициализирует formatter для нужного мне перевода из
@@ -53,6 +62,8 @@ public class EditSampleController {
     @FXML
     private void initialize(){
         comboAirbus.setItems(FXCollections.observableArrayList(Airbus.values()));
+        from.setItems(FXCollections.observableArrayList(getMasNameTown()));
+        to.setItems(FXCollections.observableArrayList(getMasNameTown()));
         formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         StringConverter<Date> convertDate = new StringConverter<Date>() {
@@ -100,8 +111,8 @@ public class EditSampleController {
         int year=Integer.parseInt(dateString[2]);
         datePicker.setValue(LocalDate.of(year,mouth,day));
         time.setText(converterDateToString(flight.getDeparture())[1]);
-        from.setText(flight.getRoute().getPointOfDeparture());
-        to.setText(flight.getRoute().getPointOfArrival());
+        from.setValue(flight.getRoute().getPointOfDeparture());
+        to.setValue(flight.getRoute().getPointOfArrival());
         travelTimeMinutes.setText(Integer.toString(flight.getTravelTime()));
     }
 
@@ -121,13 +132,10 @@ public class EditSampleController {
 
     public void edit(ActionEvent actionEvent) throws ParseException {
         if(inputCheck()) {
-            flight.setId(Integer.parseInt(id.getText()));
             flight.setIdAirbus(comboAirbus.getValue());
             String dateString = datePicker.getValue().format(formatter) + " " + time.getText();
             flight.setDeparture(new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(dateString));
-            String fromString = from.getText();
-            String toString = to.getText();
-            flight.setRoute(new Route(fromString, toString));
+            flight.setRoute(new Route(from.getValue(),to.getValue()));
             flight.setTravelTime(Integer.parseInt(travelTimeMinutes.getText()));
             stage.close();
         }
@@ -162,11 +170,14 @@ public class EditSampleController {
                 errorMessage += "Wrong date and time format";
             }
         }
-        if ((from.getText() == null) || (from.getText().length() == 0)) {
+        if (from.getValue() == null) {
             errorMessage += "Empty field From";
         }
-        if ((to.getText() == null) || (to.getText().length() == 0)) {
+        if (to.getValue() == null) {
             errorMessage += "Empty field To";
+        }
+        if (from.getValue().equals(to.getValue())){
+            errorMessage += "Сan't be the same way";
         }
         if ((travelTimeMinutes.getText() == null) || (travelTimeMinutes.getText().length() == 0)) {
             errorMessage += "Empty field Id";

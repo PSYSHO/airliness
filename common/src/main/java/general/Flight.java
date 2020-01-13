@@ -1,5 +1,9 @@
 package general;
 
+/*import com.sun.corba.se.spi.ior.Writeable;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.WritableValue;*/
 
 import java.util.Date;
 
@@ -27,18 +31,6 @@ public class Flight implements Comparable<Flight> {
         this.route = route;
         this.departure = departure;
         this.travelTimeMinutes = travelTimeMinutes;
-    }
-
-    public boolean isVariability() {
-        return variability;
-    }
-
-    public boolean isVariabilitytrue() {
-        return variability = true;
-    }
-
-    public boolean isVariabilityfalse() {
-        return variability = false;
     }
 
     public int getId() {
@@ -85,5 +77,24 @@ public class Flight implements Comparable<Flight> {
     @Override
     public int compareTo(Flight element) {
         return departure.compareTo(element.departure);
+    }
+
+    @Override
+    public String toString(){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(id).append(" | ").append(idAirbus).append(" | ").append(route).append(" | ").append(departure).append(" | ").append(travelTimeMinutes).append(" | ").append("\n");
+        return stringBuilder.toString();
+    }
+
+    public boolean isVariability() {
+        return variability;
+    }
+
+    public boolean isVariabilitytrue() {
+        return variability = true;
+    }
+
+    public boolean isVariabilityfalse() {
+        return variability = false;
     }
 }

@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class Server {
     public static void main(String[] args) {
-        int port = 8000;
+        /*int port = 8000;
         List fly = new ArrayList<AirLinesServer>();
         try (ServerSocket server = new ServerSocket(port)
         ) {
@@ -25,7 +25,7 @@ public class Server {
             }
         } catch (IOException e) {
         }
-
+*/
 
     }
     //todo сделать настройку в пом для клиента и ервера где лежат мейн классы

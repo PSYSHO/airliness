@@ -1,4 +1,4 @@
-package interfaceController;
+package sample.interfaceController;
 
 import general.Airbus;
 import general.Flight;
@@ -21,12 +21,29 @@ import sample.Client;
 import general.TypeMessage;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class MainSceneController {
+
+
     private Client client;
+    private Stage stage;
+    private List<Flight> listFlights;
+
+    @FXML
+    private Button search;
+
+    @FXML
+    private Label labelM;
+
+    @FXML
+    private Label labelS;
+
+    @FXML
+    private TextField searchField;
 
     @FXML
     private TableView<Flight> tableFlights;
@@ -56,8 +73,12 @@ public class MainSceneController {
      * Конструктор инициализирующий клиента и передающий ему параметр типа MainSceneController
      */
     public MainSceneController() {
+    try{
+        client = new Client(this);
+    } catch (IOException ex){
+        this.listFlights(null,"Ошибка соединения с сервером");
     }
-
+    }
 
     /**
      * Метод вызывающийся автоматически, инициализирует TableView
@@ -112,7 +133,7 @@ public class MainSceneController {
      * @return возвращает тип StringProperty, преобразованный из типа String
      */
     private StringProperty getRouteFrom(TableColumn.CellDataFeatures<Flight, String> param) {
-        return new SimpleStringProperty(param.getValue().getRoute().getPointOfArrival());
+        return new SimpleStringProperty(param.getValue().getRoute().getPointOfDeparture());
     }
 
     /**
@@ -123,7 +144,7 @@ public class MainSceneController {
      */
     private StringProperty getRouteTo(TableColumn.CellDataFeatures<Flight, String> param) {
         System.out.println("getRouteTo");
-        return new SimpleStringProperty(param.getValue().getRoute().getPointOfDeparture());
+        return new SimpleStringProperty(param.getValue().getRoute().getPointOfArrival());
     }
 
     /**
@@ -157,9 +178,11 @@ public class MainSceneController {
      *
      * @param list список рейсов переданного с сервера
      */
-    public void listFlights(List<Flight> list) {
-        Collections.sort(list);
-        initTableData(FXCollections.observableArrayList(list));
+    public void listFlights(List<Flight> list , String message) {
+        labelS.setText(message);
+        listFlights = list;
+        Collections.sort(listFlights);
+        initTableData(FXCollections.observableArrayList(listFlights));
     }
 
     /**
@@ -180,17 +203,17 @@ public class MainSceneController {
      * @throws IOException ошибка соединения
      */
     @FXML
-    public void add(ActionEvent actionEvent){
+    public void add(ActionEvent actionEvent) {
         Stage newStage = new Stage();
         FXMLLoader addLoader = new FXMLLoader();
-        newStage.setTitle(TypeMessage.addFlight.getMessage());
+        newStage.setTitle(TypeMessage.addFlight.name());
         URL xmlUrl = getClass().getResource("/sample/fxmlFile/addSample.fxml");
         addLoader.setLocation(xmlUrl);
         try {
             Parent newRoot = addLoader.load();
             Scene newScene = new Scene(newRoot);
             newStage.setScene(newScene);
-        } catch (IOException e){
+        } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("No Connection");
             alert.setHeaderText(e.getMessage());
@@ -198,12 +221,12 @@ public class MainSceneController {
         }
         newStage.initModality(Modality.APPLICATION_MODAL);
         AddSampleController controller = addLoader.getController();
-        controller.setStage(newStage);
+        controller.setStage(newStage,listFlights);
         newStage.showAndWait();
-        if(controller.isOnClick()) {
+        if (controller.isOnClick()) {
             try {
-                client.add(TypeMessage.addFlight.getMessage(), controller.getFlight(), -1);
-            } catch(IOException e){
+                client.receivingMessage(TypeMessage.addFlight, controller.getFlight(), controller.getFlight().getId());
+            } catch (IOException e) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("No connection");
                 alert.setHeaderText(e.getMessage());
@@ -266,10 +289,9 @@ public class MainSceneController {
     public void delete(ActionEvent actionEvent) throws IOException {
         int index = tableFlights.getSelectionModel().getSelectedIndex();
         if (index > -1) {
+            Flight obj =  tableFlights.getItems().get(index);
             tableFlights.getItems().remove(index);
-            Flight obj=new Flight();
-            String message=TypeMessage.deleteFlight.getMessage();
-            client.deleteFlight(message,obj,index);
+            client.receivingMessage(TypeMessage.deleteFlight, obj,obj.getId());
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("No Selection");
@@ -293,7 +315,7 @@ public class MainSceneController {
     public void edit(ActionEvent actionEvent) throws IOException {
         Stage editStage = new Stage();
         FXMLLoader editLoader = new FXMLLoader();
-        editStage.setTitle(TypeMessage.editFlight.getMessage());
+        editStage.setTitle(TypeMessage.editFlight.name());
         URL editURL = getClass().getResource("/sample/fxmlFile/editSample.fxml");
         editLoader.setLocation(editURL);
         Parent root = editLoader.load();
@@ -306,8 +328,7 @@ public class MainSceneController {
             Flight flightEdit = tableFlights.getSelectionModel().getSelectedItem();
             controller.setEditFlight(flightEdit);
             editStage.showAndWait();
-            String message=TypeMessage.editFlight.getMessage();
-            client.edit(flightEdit,message, tableFlights.getSelectionModel().getSelectedIndex());
+            client.receivingMessage( TypeMessage.editFlight,flightEdit, flightEdit.getId());
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("No Selection");
@@ -317,13 +338,12 @@ public class MainSceneController {
         }
     }
 
-    public void start() {
-        String message = TypeMessage.getFlight.getMessage();
+    public void start(Stage stage) {
+        this.stage = stage;
         Flight obj = new Flight();
         int index = -1;
         try {
-            client = new Client(this);
-            client.getAllFlight(message, obj, index);
+            client.receivingMessage(TypeMessage.getFlight, obj, index);
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("No connection");
@@ -331,6 +351,72 @@ public class MainSceneController {
             alert.setContentText("Please check your connection to the server");
             alert.showAndWait();
             tableFlights.getAccessibleHelp();
+        }
+    }
+
+    @FXML
+    public void getFlights(ActionEvent actionEvent) {
+        start(stage);
+    }
+
+    @FXML
+    public void search(ActionEvent actionEvent) {
+        List<Flight> listSearch = new ArrayList<Flight>();
+        if (isClick()) {
+            String searchString = searchField.getText();
+            for (Flight flight : listFlights) {
+                int i = 0; //текущее положение курсора
+                boolean flag = false; //зашел в цикл поиска
+                int lengthSearch = searchString.length();
+                int lengthFlight = flight.toString().length();
+                exit:
+                while (i + lengthSearch < lengthFlight - 1) {
+                    int j = 0;
+                    flag = false;
+                    while ((searchString.charAt(j) == flight.toString().charAt(i)) && (j <= lengthSearch - 1)) {
+                        if (j == lengthSearch - 1) {
+                            listSearch.add(flight);
+                            System.out.println(flight);
+                            break exit;
+                        }
+                        flag = true;
+                        i++;
+                        j++;
+                    }
+                    if (!flag) {
+                        i++;
+                    }
+                }
+            }
+            if (listSearch.size()!=0) {
+                listFlights(listSearch, "Поиск по запросу " + searchString + " прошел успешно...");
+            } else
+                listFlights(listSearch, "Поиск по запросу " + searchString + " не нашел ни одного совпадения...");
+        }
+    }
+
+
+
+   /* private int eSearch(String[] mas, String objSearch){
+
+    }*/
+
+    private boolean isClick() {
+        String messageError = "";
+        if (searchField.getText().length() == 0) {
+            messageError += "Nothing entered ib the field";
+        }
+        if (messageError.length() != 0) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.initOwner(stage);
+            alert.setTitle("Invalid Fields");
+            alert.setHeaderText("Please correct invalid fields");
+            alert.setContentText(messageError);
+            alert.showAndWait();
+
+            return false;
+        } else {
+            return true;
         }
     }
 }

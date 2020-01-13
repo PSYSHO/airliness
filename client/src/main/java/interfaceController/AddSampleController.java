@@ -1,11 +1,14 @@
-package interfaceController;
+package sample.interfaceController;
 
 import general.Airbus;
 import general.Flight;
 import general.Route;
+import general.TravelCities;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -16,7 +19,9 @@ import javafx.util.StringConverter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 public class AddSampleController {
@@ -24,6 +29,7 @@ public class AddSampleController {
     private Stage stage;
     private Flight flight;
     private SimpleDateFormat dateFormat;
+    private List<Flight> oldFlights;
 
     /**
      * переменная флаг, меняется на true, только в том случае когда создалась правильный объект Flight
@@ -46,15 +52,22 @@ public class AddSampleController {
     private TextField travelTimeMinutes;
 
     @FXML
-    private TextField from;
+    private ComboBox<String> from;
 
     @FXML
-    private TextField to;
+    private ComboBox<String> to;
 
     public Flight getFlight() {
         return flight;
     }
 
+    private ArrayList<String> getMasNameTown(){
+        ArrayList<String> masNameTown=new ArrayList<String>();
+        for(TravelCities element: TravelCities.values()){
+            masNameTown.add(element.getNameTown());
+        }
+        return masNameTown;
+    }
     /**
      * Инициализирует ComboBox элементами типа Airbus,
      * инициализирует formatter для нужного мне перевода из
@@ -64,6 +77,8 @@ public class AddSampleController {
     @FXML
     private void initialize() {
         comboAirbus.setItems(FXCollections.observableArrayList(Airbus.values()));
+        from.setItems(FXCollections.observableArrayList(getMasNameTown()));
+        to.setItems(FXCollections.observableArrayList(getMasNameTown()));
         formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         StringConverter<Date> convertDate = new StringConverter<Date>() {
@@ -93,8 +108,9 @@ public class AddSampleController {
         };
     }
 
-    public void setStage(Stage stage) {
+    public void setStage(Stage stage,List<Flight> oldFlights) {
         this.stage = stage;
+        this.oldFlights=oldFlights;
     }
 
     @FXML
@@ -116,9 +132,7 @@ public class AddSampleController {
             flight.setIdAirbus(comboAirbus.getValue());
             String dateString = datePicker.getValue().format(formatter) + " " + time.getText();
             flight.setDeparture(new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(dateString));
-            String fromString = from.getText();
-            String toString = to.getText();
-            flight.setRoute(new Route(fromString, toString));
+            flight.setRoute(new Route(from.getValue(), to.getValue()));
             flight.setTravelTime(Integer.parseInt(travelTimeMinutes.getText()));
             stage.close();
             flag = true;
@@ -135,12 +149,16 @@ public class AddSampleController {
         if ((id.getText() == null) || (id.getText().length() == 0)) {
             errorMessage += "Empty field Id";
         } else {
+
             try {
-                Integer.parseInt(id.getText());
+                if(searchId(Integer.parseInt(id.getText()))){
+                    errorMessage += "Id value is repeated";
+                }
             } catch (NumberFormatException e) {
                 errorMessage += "Wrong Id field number input format";
             }
         }
+
         if (comboAirbus.getValue() == null) {
             errorMessage += "Empty field Airbus";
         }
@@ -154,11 +172,14 @@ public class AddSampleController {
                 errorMessage += "Wrong date and time format";
             }
         }
-        if ((from.getText() == null) || (from.getText().length() == 0)) {
+        if (from.getValue() == null) {
             errorMessage += "Empty field From";
         }
-        if ((to.getText() == null) || (to.getText().length() == 0)) {
+        if (to.getValue() == null) {
             errorMessage += "Empty field To";
+        }
+        if (from.getValue().equals(to.getValue())){
+            errorMessage += "Сan't be the same way";
         }
         if ((travelTimeMinutes.getText() == null) || (travelTimeMinutes.getText().length() == 0)) {
             errorMessage += "Empty field Id";
@@ -182,6 +203,18 @@ public class AddSampleController {
             return false;
         }
 
+    }
+
+    /**
+     * Поиск повторяющийхс уникальных ключей
+     */
+    public boolean searchId(int id){
+        for(Flight flight:oldFlights){
+            if (flight.getId()==id){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

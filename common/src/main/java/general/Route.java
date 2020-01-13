@@ -27,4 +27,10 @@ public class Route {
     public void setPointOfDeparture(String pointOfDeparture) {
         this.pointOfDeparture = pointOfDeparture;
     }
+
+    public  String toString(){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(pointOfDeparture).append(" | ").append(pointOfArrival);
+        return stringBuilder.toString();
+    }
 }

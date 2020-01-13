@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<AnchorPane prefHeight="335.0" prefWidth="457.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="interfaceController.EditSampleController">
+<AnchorPane prefHeight="335.0" prefWidth="457.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.interfaceController.EditSampleController">
    <children>
       <GridPane layoutX="34.0" layoutY="16.0" prefHeight="321.0" prefWidth="389.0">
         <columnConstraints>
@@ -35,10 +35,7 @@
             <Label text="Time" GridPane.rowIndex="3" />
             <Label text="From" GridPane.rowIndex="4" />
             <Label text="To" GridPane.rowIndex="5" />
-            <TextField fx:id="id" GridPane.columnIndex="1" />
             <TextField fx:id="time" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            <TextField fx:id="from" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-            <TextField fx:id="to" GridPane.columnIndex="1" GridPane.rowIndex="5" />
             <Button fx:id="edit" mnemonicParsing="false" onAction="#edit" text="Изменить" GridPane.rowIndex="7">
                <GridPane.margin>
                   <Insets left="60.0" />
@@ -53,6 +50,9 @@
             <Label text="Travel time minutes" GridPane.rowIndex="6" />
             <ComboBox fx:id="comboAirbus" prefHeight="25.0" prefWidth="198.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <DatePicker fx:id="datePicker" prefHeight="25.0" prefWidth="199.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Label fx:id="id" prefHeight="32.0" prefWidth="194.0" text="Label" GridPane.columnIndex="1" />
+            <ComboBox fx:id="from" prefHeight="25.0" prefWidth="196.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <ComboBox fx:id="to" prefHeight="25.0" prefWidth="204.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
          </children>
       </GridPane>
    </children>

@@ -1,65 +1,48 @@
 package sample;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.LoadException;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import interfaceController.MainSceneController;
+import sample.interfaceController.MainSceneController;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.URL;
-import java.util.Optional;
 
 public class Main extends Application {
-
+    MainSceneController controller;
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage){
         try {
-            FXMLLoader loader=new FXMLLoader();
             URL xmlUrl=getClass().getResource("fxmlFile/sample.fxml");
+            FXMLLoader loader=new FXMLLoader();
             loader.setLocation(xmlUrl);
             Parent root=loader.load();
             primaryStage.setTitle("Авиарейсы");
-            primaryStage.setScene(new Scene(root, 800, 550));
+            primaryStage.setScene(new Scene(root, 800, 585));
             primaryStage.show();
-            MainSceneController controller=loader.getController();
-            controller.start();
+            controller=loader.getController();
+            controller.start(primaryStage);
             primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
                 public void handle(WindowEvent we) {
-                    if(1==showConfirmation())
+                    if(1==controller.showConfirmation())
                         we.consume();
                 }
             });
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (LoadException e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No Connection");
+            alert.setHeaderText("Нет соединения с сервером");
+            alert.showAndWait();
         }
-    }
+        catch (IOException e){e.printStackTrace();}
 
-    /**
-     * Подтверждение выхода из приложения
-     */
-    public int showConfirmation()  {
-        Alert exitAlert=new Alert(Alert.AlertType.CONFIRMATION);
-        exitAlert.setTitle("Window exit");
-        exitAlert.setHeaderText("Вы действительно хотите выйти?");
-        Optional<ButtonType> optional=exitAlert.showAndWait();
-        if( optional.get()==ButtonType.CANCEL){
-            try {
-                return 1;
-            } catch (Exception e){
-            }
-        }
-        return 0;
     }
 
     public static void main(String[] args) {
