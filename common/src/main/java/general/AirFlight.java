@@ -54,4 +54,9 @@ public class AirFlight {
         if (tip == flight.isVariability());
         return true;
     }
+    public boolean busy(Object o) {
+        Flight flight = (Flight) o;
+        if (flight.isVariability()==false){return true;}else
+            return false;
+    }
 }

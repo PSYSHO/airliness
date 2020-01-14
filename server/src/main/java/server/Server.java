@@ -1,22 +1,30 @@
 package server;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import general.AirFlight;
+import general.Flight;
+
+import java.io.*;
+import java.lang.reflect.Type;
 import java.net.ServerSocket;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Server {
+    public HashMap generalAir = new HashMap();
+    public  static String path = "journal.json";
+    public HashMap flightHashMap = new HashMap();
     public static void main(String[] args) {
-        /*int port = 8000;
+        Server serverC = null;
+        HashMap flightHashMap = new HashMap();
+        int port = 8000;
+        serverC.load(path,flightHashMap);
         List fly = new ArrayList<AirLinesServer>();
         try (ServerSocket server = new ServerSocket(port)
         ) {
             while (!server.isClosed()) {
-                Thread client = new Thread(new AirLinesServer(server.accept()));//todo передавать список Handler
+                //todo передавать список Handler
+                Thread client  = new Thread(new AirLinesServer(server.accept(), (ArrayList<AirLinesServer>) fly,flightHashMap ));
                 client.start();
                 System.out.println("accepted");
                 fly.add(client);
@@ -25,8 +33,40 @@ public class Server {
             }
         } catch (IOException e) {
         }
-*/
 
+
+
+    }
+    public HashMap load(String path,HashMap hashMap){
+        AirFlight journal = new AirFlight();
+        Gson gson = new Gson();
+        try {
+            FileReader fileReader = new FileReader(path);
+            journal = gson.fromJson(fileReader , (Type) Flight.class);
+            fileReader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for(int i =0;i>=journal.getSize();i++){
+            int id = journal.getFlight(i).getId();
+            Flight flight = journal.getFlight(i);
+            hashMap.put(id,flight);
+        }
+        return hashMap;
+    }
+    public void save(String path, HashMap hashMap){
+        AirFlight airflight = new AirFlight();
+        for (Object flight: hashMap.values()){
+            airflight.add((Flight) flight);
+        }
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        try {
+            FileWriter fileWriter = new FileWriter(path);
+            fileWriter.write(gson.toJson(airflight));
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     //todo сделать настройку в пом для клиента и ервера где лежат мейн классы
     // сделать сборку джарок с либами мавена

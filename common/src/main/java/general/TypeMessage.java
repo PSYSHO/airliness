@@ -4,5 +4,6 @@ public enum TypeMessage {
     getFlight,
     deleteFlight,
     editFlight,
-    addFlight;
+    addFlight,
+    objectIsBusy;
 }
