@@ -20,8 +20,8 @@ import java.lang.reflect.Type;
 import java.net.Socket;
 
 import com.google.gson.*;
-import sample.interfaceController.MainSceneController;
-import sample.interfaceController.ThreadAlert;
+import interfaceController.MainSceneController;
+import interfaceController.ThreadAlert;
 
 import java.util.ArrayList;
 import java.util.Properties;

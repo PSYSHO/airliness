@@ -38,6 +38,7 @@ public class AirLinesServer implements ControlInterface {
     @Override
     public void run() {
         try {
+            TypeMessage typeMessage;
             AirLinesServer airLinesServer = null;
             String json ="";
             String getFlight;
@@ -56,13 +57,13 @@ public class AirLinesServer implements ControlInterface {
                 json = in.readUTF();
                 Request request =gson.fromJson(json,GeneralRequest.class);
                 switch(request.getMessage()) {
-                    case "String.valueOf(TypeMessage.getFlight)":
+                    case "getFlight":
                         getFlight = new Gson().toJson(flights);
                         out.writeUTF(getFlight);
                         out.flush();
                         System.out.println("Сервер отправи журнал");
                         break;
-                    case "String.valueOf(deleteFlight)":
+                    case "deleteFlight":
                         i = request.getIndex();
                         journal = (Flight) flights.get(i);
                         if(journal.isVariability()==false){
@@ -75,12 +76,12 @@ public class AirLinesServer implements ControlInterface {
                         out.flush();
                         airLinesServer.Update();
                         break;
-                    case "String.valueOf(TypeMessage.addFlight)":
+                    case "addFlight":
                         Flight flight = (Flight) request.getObject();
                         flights.put(flight.getId(),flight);
                         airLinesServer.Update();
                         break;
-                    case "String.valueOf(TypeMessage.editFlight)":
+                    case "editFlight":
                         Flight flightEdit=(Flight)request.getObject();
                         if(flightEdit.isVariability()==false) {
                             flightEdit.isVariabilitytrue();
@@ -91,7 +92,7 @@ public class AirLinesServer implements ControlInterface {
                         out.flush();
                         airLinesServer.Update();
                         break;
-                    case"quit":
+                    case "TypeMessage.quit":
                         in.close();
                         out.close();
                         Dialog.close();
