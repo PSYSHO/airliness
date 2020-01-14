@@ -12,13 +12,14 @@ import java.util.*;
 
 public class Server {
     public HashMap generalAir = new HashMap();
-    public  static String path = "journal.json";
+    public  static String path = "F:\\Net\\airlines\\server\\src\\main\\java\\server\\journal.json";
     public HashMap flightHashMap = new HashMap();
+    public Server(){}
     public static void main(String[] args) {
-        Server serverC = null;
+        Server conteins = new Server();
         HashMap flightHashMap = new HashMap();
         int port = 8000;
-        serverC.load(path,flightHashMap);
+        conteins.load(path,flightHashMap);
         List fly = new ArrayList<AirLinesServer>();
         try (ServerSocket server = new ServerSocket(port)
         ) {
