@@ -109,6 +109,7 @@ public class AirLinesServer implements ControlInterface {
             AirLinesServer airLinesServer = (AirLinesServer) o;
             String getFlight = new Gson().toJson(flights);
             try {
+                out.writeUTF(String.valueOf(TypeMessage.update));
                 out.writeUTF(getFlight);
                 out.flush();
             } catch (IOException e) {
