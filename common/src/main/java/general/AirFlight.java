@@ -1,7 +1,11 @@
 package general;
 
+import com.google.gson.Gson;
+
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 public class AirFlight {
@@ -10,12 +14,8 @@ public class AirFlight {
 
     public AirFlight(){}
 
-    public AirFlight(List journal) {
+    public AirFlight(List<Flight> journal) {
         this.journal=journal;
-    }
-
-    public AirFlight(ArrayList<Flight> flights) {
-        this.journal = flights;
     }
 
     public List<Flight> getJournal() {
@@ -54,9 +54,5 @@ public class AirFlight {
         if (tip == flight.isVariability());
         return true;
     }
-    public boolean busy(Object o) {
-        Flight flight = (Flight) o;
-        if (flight.isVariability()==false){return true;}else
-            return false;
-    }
+
 }

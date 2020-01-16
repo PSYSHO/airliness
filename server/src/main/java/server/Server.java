@@ -12,26 +12,33 @@ import java.util.*;
 
 public class Server {
     public HashMap generalAir = new HashMap();
-    public  static String path = "F:\\Net\\airlines\\server\\src\\main\\java\\server\\journal.json";
     public HashMap flightHashMap = new HashMap();
     public Server(){}
-    public static void main(String[] args) {
-        Server conteins = new Server();
+    public static void main(String[] args) throws IOException {
         HashMap flightHashMap = new HashMap();
+        String path = "journal.json";
         int port = 8000;
+        Server conteins = new Server();
+        Gson gson = new Gson();
         conteins.load(path,flightHashMap);
         List fly = new ArrayList<AirLinesServer>();
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
         try (ServerSocket server = new ServerSocket(port)
         ) {
             while (!server.isClosed()) {
-                //todo передавать список Handler
                 Thread client  = new Thread(new AirLinesServer(server.accept(), (ArrayList<AirLinesServer>) fly,flightHashMap ));
                 client.start();
                 System.out.println("accepted");
                 fly.add(client);
-                for (Object controlInterface:fly){
+                String serverCommand = bufferedReader.readLine();
+                if(serverCommand.equals("quit")){
+                    System.out.println("Main server exiting...");
+                    conteins.save(path,flightHashMap);
+                    server.close();
+                    break;
                 }
             }
+
         } catch (IOException e) {
         }
 
@@ -39,11 +46,11 @@ public class Server {
 
     }
     public HashMap load(String path,HashMap hashMap){
-        AirFlight journal = new AirFlight();
+        AirFlight  journal = new AirFlight();
         Gson gson = new Gson();
         try {
             FileReader fileReader = new FileReader(path);
-            journal = gson.fromJson(fileReader , (Type) Flight.class);
+            journal = gson.fromJson(fileReader , AirFlight.class);
             fileReader.close();
         } catch (IOException e) {
             e.printStackTrace();
