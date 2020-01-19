@@ -19,13 +19,14 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AirLinesServer implements ControlInterface {
     List fly = new ArrayList<AirLinesServer>();
     int i = 0;
     public int pos;
     private static Socket Dialog;
-    private HashMap flightsMap = new HashMap();
+    private Map flightsMap = new HashMap();
     List flights = new ArrayList<Flight>();
 
     public AirLinesServer() {
@@ -35,10 +36,10 @@ public class AirLinesServer implements ControlInterface {
         AirLinesServer.Dialog = client;
     }
 
-    public AirLinesServer(Socket client, ArrayList<AirLinesServer> arrayList, HashMap hashMap) {
+    public AirLinesServer(Socket client, ArrayList<AirLinesServer> arrayList,Map map) {
         AirLinesServer.Dialog = client;
         fly = arrayList;
-        flightsMap = hashMap;
+        flightsMap = map;
     }
 
     @Override
@@ -64,8 +65,8 @@ public class AirLinesServer implements ControlInterface {
             while (!Dialog.isClosed()) {
                 Flight journal = new Flight();
                 json = in.readUTF();
-                Message request = gson.fromJson(json, GeneralMessage.class);
-                switch (request.getMessage()) {
+                Message message = gson.fromJson(json, GeneralMessage.class);
+                switch (message.getMessage()) {
                     case getFlight:
                         MessageFromServer messageFromServer = new ListFromServer(TypeMessage.getFlight, flights);
                         getFlight = new Gson().toJson(messageFromServer);
@@ -73,37 +74,38 @@ public class AirLinesServer implements ControlInterface {
                         out.flush();
                         break;
                     case deleteFlight:
-                        i = request.getIndex();
-                        journal = (Flight) flightsMap.get(i);
+                        i = message.getIndex();
                         if (journal.isVariability() == false) {
                             flightsMap.remove(i);
                         } else {
-
                             out.writeUTF(String.valueOf(TypeMessage.objectIsBusy));
                             out.flush();
                         }
-                        getFlight = new Gson().toJson(flightsMap);
+                        Message message1 = new GeneralMessage(TypeMessage.deleteFlight, null, i);
+                        getFlight = new Gson().toJson(message1);
                         out.writeUTF(getFlight);
                         out.flush();
-                        airLinesServer.Update();
+                        airLinesServer.Update(message1);
                         break;
                     case addFlight:
-                        Flight flight = (Flight) request.getObject();
-                        flightsMap.put(flight.getId(), flight);
-                        airLinesServer.Update();
+                        Flight flightAdd = (Flight) message.getObject();
+                        flightsMap.put(flightAdd.getId(), flightAdd);
+                        Message message2 = new GeneralMessage(TypeMessage.addFlight, flightAdd, flightAdd.getId());
+                        airLinesServer.Update(message2);
                         break;
                     case editFlight:
-                        Flight flightEdit = (Flight) request.getObject();
+                        Flight flightEdit = (Flight) message.getObject();
                         if (flightEdit.isVariability() == false) {
                             flightEdit.isVariabilitytrue();
                             flightsMap.replace(flightEdit.getId(), flightEdit);
                         } else {
                             out.writeUTF(String.valueOf(TypeMessage.objectIsBusy));
                         }
-                        getFlight = new Gson().toJson(flightsMap);
+                        Message message3 = new GeneralMessage(TypeMessage.editFlight, flightEdit,flightEdit.getId());
+                        getFlight = new Gson().toJson(message3);
                         out.writeUTF(getFlight);
                         out.flush();
-                        airLinesServer.Update();
+                        airLinesServer.Update(message3);
                         break;
                     case quit:
                         in.close();
@@ -117,20 +119,17 @@ public class AirLinesServer implements ControlInterface {
     }
 
     @Override
-    public void Update() throws IOException {
+    public void Update(Message message) throws IOException {
         DataOutputStream out = new DataOutputStream(Dialog.getOutputStream());
         DataInputStream in = new DataInputStream(Dialog.getInputStream());
-        for (Object o : fly) {
-            AirLinesServer airLinesServer = (AirLinesServer) o;
-            String getFlight = new Gson().toJson(flightsMap);
-            try {
-                out.writeUTF(String.valueOf(TypeMessage.update));
+        String getFlight;
+        try {
+                getFlight = new Gson().toJson(message);
                 out.writeUTF(getFlight);
                 out.flush();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
     }
 
 

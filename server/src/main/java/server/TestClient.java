@@ -2,14 +2,12 @@ package server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import general.Journal;
 import general.Airbus;
 import general.Flight;
 import general.Route;
 
 import java.io.*;
-import java.lang.reflect.Type;
-import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -36,10 +34,11 @@ public class TestClient {
             e.printStackTrace();
         }
         try {
-            List<Flight> journal = new ArrayList<Flight>();
+            Journal journal = new Journal();
             ArrayList<Flight> flights1 = new ArrayList<Flight>();
-            FileReader fileReader = new FileReader("JournalFlights");
-            flights1 = gson.fromJson(fileReader,Flight.class);
+            FileReader fileReader = new FileReader("journal.json");
+            journal = gson.fromJson(fileReader, Journal.class);
+            System.out.println("");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

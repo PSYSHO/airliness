@@ -6,7 +6,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Properties;
 
-public class Server {
+public class ServerS {
     public  static void main(String[] args) {
         try{
             FileInputStream fil=new FileInputStream("common/src/main/java/general/config.properties");
