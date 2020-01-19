@@ -12,17 +12,16 @@ public class Flight implements Comparable<Flight> {
     private Airbus idAirbus;
     private Route route;
     private Date departure;
-    private  int travelTimeMinutes;
+    private int travelTimeMinutes;
     private boolean variability = false;
 
 
-
     public Flight() {
-        id=0;
-        idAirbus=Airbus.NuN;
-        route=new Route("","");
-        departure=new Date(1000L);
-        travelTimeMinutes=0;
+        id = 0;
+        idAirbus = Airbus.NuN;
+        route = new Route("", "");
+        departure = new Date(1000L);
+        travelTimeMinutes = 0;
     }
 
     public Flight(int id, Airbus idAirbus, Route route, Date departure, int travelTimeMinutes) {
@@ -80,7 +79,7 @@ public class Flight implements Comparable<Flight> {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(id).append(" | ").append(idAirbus).append(" | ").append(route).append(" | ").append(departure).append(" | ").append(travelTimeMinutes).append(" | ").append("\n");
         return stringBuilder.toString();

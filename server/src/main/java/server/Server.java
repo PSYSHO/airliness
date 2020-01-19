@@ -2,7 +2,6 @@ package server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import general.AirFlight;
 import general.Flight;
 
 import java.io.*;
@@ -11,29 +10,35 @@ import java.net.ServerSocket;
 import java.util.*;
 
 public class Server {
-    public HashMap generalAir = new HashMap();
     public HashMap flightHashMap = new HashMap();
-    public Server(){}
+
+    public Server() {
+    }
+
     public static void main(String[] args) throws IOException {
         HashMap flightHashMap = new HashMap();
         String path = "journal.json";
-        int port = 8000;
         Server conteins = new Server();
         Gson gson = new Gson();
-        conteins.load(path,flightHashMap);
+        FileInputStream fil = new FileInputStream("config.properties");
+        Properties property = new Properties();
+        property.load(fil);
+        String port = property.getProperty("may.port");
+        conteins.load(path, flightHashMap);
         List fly = new ArrayList<AirLinesServer>();
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-        try (ServerSocket server = new ServerSocket(port)
+        try (ServerSocket server = new ServerSocket(Integer.parseInt(port))
         ) {
             while (!server.isClosed()) {
-                Thread client  = new Thread(new AirLinesServer(server.accept(), (ArrayList<AirLinesServer>) fly,flightHashMap ));
+                Thread client = new Thread(new AirLinesServer(server.accept(), (ArrayList<AirLinesServer>) fly, flightHashMap));
                 client.start();
                 System.out.println("accepted");
                 fly.add(client);
                 String serverCommand = bufferedReader.readLine();
-                if(serverCommand.equals("quit")){
+                if (serverCommand.equals("quit")) {
+                    conteins.save(path, flightHashMap);
                     System.out.println("Main server exiting...");
-                    conteins.save(path,flightHashMap);
+                    conteins.save(path, flightHashMap);
                     server.close();
                     break;
                 }
@@ -42,44 +47,45 @@ public class Server {
         } catch (IOException e) {
         }
 
-
-
+//todo сделать генераию файла в случае если его нет
     }
-    public HashMap load(String path,HashMap hashMap){
-        AirFlight  journal = new AirFlight();
+
+    public HashMap load(String path, HashMap hashMap) {
+        List journal = new ArrayList<Flight>();
         Gson gson = new Gson();
+        gson.toJson(flightHashMap);
         try {
-            FileReader fileReader = new FileReader(path);
-            journal = gson.fromJson(fileReader , AirFlight.class);
+            FileReader fileReader = new FileReader("JournalFlights");
+            journal = gson.fromJson(fileReader, (Type) Flight.class);
             fileReader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        for(int i =0;i>=journal.getSize();i++){
-            int id = journal.getFlight(i).getId();
-            Flight flight = journal.getFlight(i);
-            hashMap.put(id,flight);
+        int k = journal.size();
+        for (int i = 0; i < k; i++) {
+            Flight flight = new Flight();
+            flight = (Flight) journal.get(i);
+            int id  = flight.getId();
+            hashMap.put(id,journal.get(i));
         }
         return hashMap;
     }
-    public void save(String path, HashMap hashMap){
-        AirFlight airflight = new AirFlight();
-        for (Object flight: hashMap.values()){
-            airflight.add((Flight) flight);
+
+    public void save(String path, HashMap hashMap) {
+        List flights = new ArrayList<Flight>();
+        for (Object flight : hashMap.values()) {
+            flights.add((Flight) flight);
         }
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try {
-            FileWriter fileWriter = new FileWriter(path);
-            fileWriter.write(gson.toJson(airflight));
+            FileWriter fileWriter = new FileWriter("JournalFlights");
+            fileWriter.write(gson.toJson(flights));
             fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
     //todo сделать настройку в пом для клиента и ервера где лежат мейн классы
-    // сделать сборку джарок с либами мавена
-    // почитать про runnable  при измменении данных оповещать вех клиентов
-    // сделать проверку уникальности по id при добавлении или редактировании
     // клиенты работают с своими данными сервер хранит у себя оригинал и сохраняет в конце своей работы
 
 }
