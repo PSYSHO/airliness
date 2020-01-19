@@ -109,7 +109,7 @@ public class Client {
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
-                            //находит в строке сообщение, если getFlight, то выполняет прием списка с рйсами, если ругой, то в зависимости от сообщения выполняются определенные действия
+                            //находит в строке сообщение, если getFlight, то выполняет прием списка с рейсами, если другой, то в зависимости от сообщения выполняются определенные действия
                             String messageGetFlight = incomingMessage.substring(12, 21);
                             if (messageGetFlight.equals(TypeMessage.getFlight.name())) {
                                 messageFromServer = new Gson().fromJson(incomingMessage, ListFromServer.class);
@@ -129,7 +129,7 @@ public class Client {
     }
 }
 
-/* *//**
+ /**
  * Заносим в поток ввод серелизованный обект интерфейса Request
  * и по потоку вывода передаем серверу
  * <p>

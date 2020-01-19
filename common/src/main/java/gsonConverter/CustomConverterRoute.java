@@ -23,10 +23,16 @@ public class CustomConverterRoute implements JsonSerializer<Route>, JsonDeserial
 
     @Override
     public JsonElement serialize(Route route, Type type, JsonSerializationContext context) {
-        JsonObject result=new JsonObject();
-        result.addProperty("from",route.getPointOfDeparture());
-        result.addProperty("to",route.getPointOfArrival());
+        JsonObject result = new JsonObject();
+        if (route != null) {
+            result.addProperty("from", route.getPointOfDeparture());
+            result.addProperty("to", route.getPointOfArrival());
+        } else {
+            result.addProperty("from", "");
+            result.addProperty("to", "");
+        }
         return  result;
+
     }
 }
 

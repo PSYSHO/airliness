@@ -68,17 +68,17 @@ public class ThreadedHandler implements Runnable {
                     case deleteFlight:
                         //получаем из запроса индекс элемента на удаление
                         int i = message.getIndex();
-                        Flight deleteFlight = new Flight();
+                        //Flight deleteFlight = new Flight();
                         //удаяем его из списка
                         for (int j = 0; j < flights.size(); j++) {
                             if (flights.get(j).getId() == i) {
-                                deleteFlight = flights.get(j);
+                                //deleteFlight = flights.get(j);
                                 flights.remove(j);
                                 break;
                             }
                         }
                         //получившийся список сериализуем и отправляем клиенту
-                        Message message1 = new GeneralMessage(TypeMessage.deleteFlight, deleteFlight, i);
+                        Message message1 = new GeneralMessage(TypeMessage.deleteFlight, null, i);
                         getFlightsJson = gson.toJson(message1);
                         write.writeUTF(getFlightsJson);
                         write.flush();

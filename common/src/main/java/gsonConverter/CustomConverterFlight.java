@@ -45,11 +45,19 @@ public class CustomConverterFlight implements JsonSerializer<Flight>, JsonDeseri
     @Override
     public JsonElement serialize(Flight flight, Type type, JsonSerializationContext context) {
         JsonObject result=new JsonObject();
-        result.addProperty("id", flight.getId());
-        result.addProperty("airbus", flight.getIdAirbus().name());
-        result.addProperty("departure", flight.getDeparture().getTime());
-        result.add("route", context.serialize(flight.getRoute()));
-        result.addProperty("travelTimeMinutes", flight.getTravelTime());
+        if (flight != null) {
+            result.addProperty("id", flight.getId());
+            result.addProperty("airbus", flight.getIdAirbus().name());
+            result.addProperty("departure", flight.getDeparture().getTime());
+            result.add("route", context.serialize(flight.getRoute()));
+            result.addProperty("travelTimeMinutes", flight.getTravelTime());
+        } else {
+            result.addProperty("id", "");
+            result.addProperty("airbus", "");
+            result.addProperty("departure", "");
+            result.add("route",null);
+            result.addProperty("travelTimeMinutes", "");
+        }
         return  result;
     }
 }
