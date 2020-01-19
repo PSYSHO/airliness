@@ -27,7 +27,7 @@ public class CustomConverterFlight implements JsonSerializer<Flight>, JsonDeseri
         JsonObject jsonObject=json.getAsJsonObject();
         Flight flight=new Flight();
         flight.setId(jsonObject.get("id").getAsInt());
-        flight.setIdAirbus(Airbus.valueOf(jsonObject.get("airbus").getAsString()));
+        flight.setIdAirbus(Airbus.valueOf(jsonObject.get("idAirbus").getAsString()));
         flight.setDeparture(new Date(jsonObject.get("departure").getAsLong()));
         flight.setRoute(context.deserialize(jsonObject.get("route"), Route.class));
         flight.setTravelTime(jsonObject.get("travelTimeMinutes").getAsInt());
@@ -47,7 +47,7 @@ public class CustomConverterFlight implements JsonSerializer<Flight>, JsonDeseri
         JsonObject result=new JsonObject();
         if (flight != null) {
             result.addProperty("id", flight.getId());
-            result.addProperty("airbus", flight.getIdAirbus().name());
+            result.addProperty("idAirbus", flight.getIdAirbus().name());
             result.addProperty("departure", flight.getDeparture().getTime());
             result.add("route", context.serialize(flight.getRoute()));
             result.addProperty("travelTimeMinutes", flight.getTravelTime());

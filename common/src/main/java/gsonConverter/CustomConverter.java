@@ -6,8 +6,6 @@ import general.TypeMessage;
 import request.GeneralMessage;
 import request.Message;
 
-import java.util.List;
-
 /**
  * Класс для сериализиции и десериалиции обекта типа Message
  * @author Kashkinov Sergey
@@ -20,7 +18,7 @@ public class CustomConverter implements JsonSerializer<Message>, JsonDeserialize
         JsonObject object = new JsonObject();
         object.addProperty("message", src.getMessage().name());
         object.add("object", context.serialize(src.getObject(), Flight.class));
-        object.addProperty("index", src.getIndex());
+        object.addProperty("index", src.getId());
         return object;
     }
 
@@ -30,7 +28,7 @@ public class CustomConverter implements JsonSerializer<Message>, JsonDeserialize
         Message message = new GeneralMessage();
         message.setMessage(TypeMessage.valueOf(jsonObject.get("message").getAsString()));
         message.setObject(context.deserialize(jsonObject.get("object"), Flight.class));
-        message.setIndex(jsonObject.get("index").getAsInt());
+        message.setId(jsonObject.get("index").getAsInt());
         return message;
     }
 }

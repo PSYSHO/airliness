@@ -1,5 +1,6 @@
 package server;
 
+import com.google.gson.Gson;
 import request.Message;
 
 import java.io.IOException;
@@ -7,6 +8,6 @@ import java.io.IOException;
 public interface ControlInterface extends Runnable {
     @Override
     void run();
-    void Update(Message message) throws IOException;
+    void Update(Message message, Gson gson) throws IOException;
 
 }

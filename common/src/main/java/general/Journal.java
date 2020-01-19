@@ -13,20 +13,21 @@ import java.util.List;
 import java.util.Map;
 
 public class Journal {
-    List journal = new ArrayList<Flight>();
+    List<Flight> journal = new ArrayList<Flight>();
     public Journal(){}
 
     public List getJournal() {
         return journal;
     }
 
-    public void setJournal(List journal) {
+    public void setJournal(List<Flight> journal) {
         this.journal = journal;
     }
     public Flight getFlight(int index){
         Flight  flight = (Flight) journal.get(index);
         return flight;
     }
+
     public int getSize(){
         int size  =  journal.size();
         return size;
@@ -36,15 +37,18 @@ public class Journal {
         Gson gson = new Gson();
         try {
             FileReader fileReader = new FileReader("journal.json");
-            journal = gson.fromJson(fileReader, Journal.class);
+            journal=gson.fromJson(fileReader,Journal.class);
             fileReader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
         int k = journal.getSize();
-        for (int i = 0; i < k; i++) {
+        /*for (int i = 0; i < k; i++) {
             List list = journal.getJournal();
             map.put(i,list.get(i));
+        }*/
+        for(Flight flight:journal.journal){
+            map.put(flight.getId(),flight);
         }
         return map;
     }

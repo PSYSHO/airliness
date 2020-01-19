@@ -71,7 +71,7 @@ public class GeneralMessage implements Message {
      *
      * @return возвращает индекс
      */
-    public int getIndex(){
+    public int getId(){
         return index;
     }
 
@@ -81,7 +81,7 @@ public class GeneralMessage implements Message {
      * @param index индекс запроса
      */
     @Override
-    public void setIndex(int index) {
+    public void setId(int index) {
         this.index=index;
     }
 }

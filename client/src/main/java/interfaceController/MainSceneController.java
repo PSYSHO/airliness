@@ -201,27 +201,33 @@ public class MainSceneController {
             Flight flight = (Flight) obj;
             switch (message) {
                 case addFlight:
-                    listFlights.add(flight);
+                    if (!searchId(id)) {
+                        listFlights.add(flight);
+                    }
                     break;
                 case editFlight:
-                    int index = -1;
-                    for (int j = 0; j < listFlights.size(); j++) {
-                        if (listFlights.get(j).getId() == id) {
-                            index = j;
-                            break;
+                    if (searchId(id)) {
+                        int index = -1;
+                        for (int j = 0; j < listFlights.size(); j++) {
+                            if (listFlights.get(j).getId() == id) {
+                                index = j;
+                                break;
+                            }
                         }
+                        listFlights.set(index, flight);
                     }
-                    listFlights.set(index, flight);
                     break;
                 case deleteFlight:
-                    int indexDelete = -1;
-                    for (int j = 0; j < listFlights.size(); j++) {
-                        if (listFlights.get(j).getId() == id) {
-                            indexDelete = j;
-                            break;
+                    if (searchId(id)) {
+                        int indexDelete = -1;
+                        for (int j = 0; j < listFlights.size(); j++) {
+                            if (listFlights.get(j).getId() == id) {
+                                indexDelete = j;
+                                break;
+                            }
                         }
+                        listFlights.remove(indexDelete);
                     }
-                    listFlights.remove(indexDelete);
                     break;
                 case cannotChage:
                 default:
@@ -229,6 +235,13 @@ public class MainSceneController {
             }
             listFlights(listFlights, "Рейс с ID: " + id + message.getDescription());
         }
+    }
+
+    private boolean searchId(int id) {
+        for(Flight flight:listFlights)
+            if (id == flight.getId())
+                return true;
+        return false;
     }
 
     /**

@@ -38,12 +38,12 @@ public interface Message {
      *
      * @return
      */
-    int getIndex();
+    int getId();
 
     /**
      * Метод изменяющий индекс запроса
      *
      * @param index индекс запроса
      */
-    void setIndex(int index);
+    void setId(int index);
 }

@@ -116,7 +116,7 @@ public class Client {
                                 controller.listFlights(messageFromServer.getList(), TypeMessage.getFlight.getDescription());
                             } else {
                                 message = gson.fromJson(incomingMessage, GeneralMessage.class);
-                                controller.listUpdate(message.getObject(), message.getMessage(), message.getIndex());
+                                controller.listUpdate(message.getObject(), message.getMessage(), message.getId());
                             }
                         }
                     });

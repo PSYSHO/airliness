@@ -67,7 +67,7 @@ public class ThreadedHandler implements Runnable {
                         break;
                     case deleteFlight:
                         //получаем из запроса индекс элемента на удаление
-                        int i = message.getIndex();
+                        int i = message.getId();
                         //Flight deleteFlight = new Flight();
                         //удаяем его из списка
                         for (int j = 0; j < flights.size(); j++) {
@@ -87,7 +87,7 @@ public class ThreadedHandler implements Runnable {
                         //получаем объект на изменение
                         Flight flightEdit = (Flight) message.getObject();
                         //получаем его индекс
-                        int idEdit = message.getIndex();
+                        int idEdit = message.getId();
                         //сортируем список чтобы индекс не отличался от сортированного списка клиента
                         Collections.sort(flights);
                         //изменяем объект списка

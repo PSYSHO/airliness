@@ -13,20 +13,16 @@ import request.ListFromServer;
 import request.Message;
 import request.MessageFromServer;
 
-
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AirLinesServer implements ControlInterface {
     List fly = new ArrayList<AirLinesServer>();
     int i = 0;
     public int pos;
     private static Socket Dialog;
-    private Map flightsMap = new HashMap();
+    private Map<Integer, Flight> flightsMap = new HashMap<Integer, Flight>();
     List flights = new ArrayList<Flight>();
 
     public AirLinesServer() {
@@ -36,7 +32,7 @@ public class AirLinesServer implements ControlInterface {
         AirLinesServer.Dialog = client;
     }
 
-    public AirLinesServer(Socket client, ArrayList<AirLinesServer> arrayList,Map map) {
+    public AirLinesServer(Socket client, List arrayList, Map map) {
         AirLinesServer.Dialog = client;
         fly = arrayList;
         flightsMap = map;
@@ -45,9 +41,7 @@ public class AirLinesServer implements ControlInterface {
     @Override
     public void run() {
         try {
-            for(Object fly: flightsMap.values()){
-                flights = (List) fly;
-            }
+            flights=updateFlights(flightsMap);
             TypeMessage typeMessage;
             AirLinesServer airLinesServer = null;
             String json = "";
@@ -74,9 +68,10 @@ public class AirLinesServer implements ControlInterface {
                         out.flush();
                         break;
                     case deleteFlight:
-                        i = message.getIndex();
+                        i = message.getId();
                         if (journal.isVariability() == false) {
                             flightsMap.remove(i);
+                            flights=updateFlights(flightsMap);
                         } else {
                             out.writeUTF(String.valueOf(TypeMessage.objectIsBusy));
                             out.flush();
@@ -85,13 +80,18 @@ public class AirLinesServer implements ControlInterface {
                         getFlight = new Gson().toJson(message1);
                         out.writeUTF(getFlight);
                         out.flush();
-                        airLinesServer.Update(message1);
+                        /* airLinesServer.Update(message1);*/
+                        Update(message1,gson);
                         break;
                     case addFlight:
                         Flight flightAdd = (Flight) message.getObject();
                         flightsMap.put(flightAdd.getId(), flightAdd);
+                        flights=updateFlights(flightsMap);
                         Message message2 = new GeneralMessage(TypeMessage.addFlight, flightAdd, flightAdd.getId());
-                        airLinesServer.Update(message2);
+                        getFlight = gson.toJson(message2);
+                        out.writeUTF(getFlight);
+                        out.flush();
+                        Update(message2,gson);
                         break;
                     case editFlight:
                         Flight flightEdit = (Flight) message.getObject();
@@ -101,11 +101,12 @@ public class AirLinesServer implements ControlInterface {
                         } else {
                             out.writeUTF(String.valueOf(TypeMessage.objectIsBusy));
                         }
-                        Message message3 = new GeneralMessage(TypeMessage.editFlight, flightEdit,flightEdit.getId());
-                        getFlight = new Gson().toJson(message3);
+                        flights=updateFlights(flightsMap);
+                        Message message3 = new GeneralMessage(TypeMessage.editFlight, flightEdit, flightEdit.getId());
+                        getFlight = gson.toJson(message3);
                         out.writeUTF(getFlight);
                         out.flush();
-                        airLinesServer.Update(message3);
+                        Update(message3,gson);
                         break;
                     case quit:
                         in.close();
@@ -119,20 +120,26 @@ public class AirLinesServer implements ControlInterface {
     }
 
     @Override
-    public void Update(Message message) throws IOException {
+    public void Update(Message message,Gson gson) throws IOException {
         DataOutputStream out = new DataOutputStream(Dialog.getOutputStream());
         DataInputStream in = new DataInputStream(Dialog.getInputStream());
         String getFlight;
         try {
-                getFlight = new Gson().toJson(message);
-                out.writeUTF(getFlight);
-                out.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            getFlight = gson.toJson(message);
+            out.writeUTF(getFlight);
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-
+    private List<Flight> updateFlights(Map<Integer, Flight> flightsMap) {
+        List<Flight> flightsList = new ArrayList<Flight>();
+        for (Map.Entry<Integer, Flight> fly : flightsMap.entrySet()) {
+            flightsList.add(fly.getValue());
+        }
+        return flightsList;
+    }
     //todo при добавлении перелета сделать обработку по Id
     // hashmap добавить для хранения перелетов -
     // блокировка элемента который используется
