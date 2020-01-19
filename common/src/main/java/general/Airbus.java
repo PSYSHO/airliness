@@ -1,5 +1,8 @@
 package general;
 
+/**
+ * Класс-перечисление со значениями airbus.
+ */
 public enum Airbus {
 
     Airbius_A300, Airbius_A310, Airbius_A3318, Airbius_A319, Airbius_A320, Airbius_A321, Airbius_A330, Airbius_A340, Airbius_A350, Airbius_A380,

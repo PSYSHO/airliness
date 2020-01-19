@@ -1,7 +1,8 @@
 package general;
 
-import java.util.ArrayList;
-
+ /**
+ * Класс со значениями город , пунктов назначения и отправления.
+ */
 public enum TravelCities {
     Samara("Самара"),
     Saint_Petersburg("Санкт-Петербург"),
@@ -20,6 +21,5 @@ public enum TravelCities {
     public String getNameTown(){
         return nameTown;
     }
-
 
 }

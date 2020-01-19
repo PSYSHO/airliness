@@ -21,14 +21,16 @@ import sample.Client;
 import general.TypeMessage;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * Класс-контролер отвечающий за главное окно интерфейса.
+ *
+ * @author Kashkinov Sergeu
+ */
 public class MainSceneController {
-
-
     private Client client;
     private Stage stage;
     private List<Flight> listFlights;
@@ -73,11 +75,11 @@ public class MainSceneController {
      * Конструктор инициализирующий клиента и передающий ему параметр типа MainSceneController
      */
     public MainSceneController() {
-    try{
-        client = new Client(this);
-    } catch (IOException ex){
-        this.listFlights(null,"Ошибка соединения с сервером");
-    }
+        try {
+            client = new Client(this);
+        } catch (IOException ex) {
+            this.listFlights(null, "Ошибка соединения с сервером");
+        }
     }
 
     /**
@@ -113,8 +115,8 @@ public class MainSceneController {
                 return getTimeFromDate(param);
             }
         });
-    }
 
+    }
 
     /**
      * Вспомогающий метод перевоящий значение типа int  в значение понятное таблице
@@ -178,11 +180,55 @@ public class MainSceneController {
      *
      * @param list список рейсов переданного с сервера
      */
-    public void listFlights(List<Flight> list , String message) {
+    public void listFlights(List<Flight> list, String message) {
         labelS.setText(message);
-        listFlights = list;
-        Collections.sort(listFlights);
-        initTableData(FXCollections.observableArrayList(listFlights));
+        if (list != null) {
+            listFlights = list;
+            Collections.sort(listFlights);
+            initTableData(FXCollections.observableArrayList(listFlights));
+        }
+    }
+
+    /**
+     * Метод обновляющий значения рейсов в списке
+     *
+     * @param obj     - объект который передается для изменения, удаления или добавления в список
+     * @param message - сообщение определяющие действия над списком
+     * @param id      - айди элемента который будет орабатываться
+     */
+    public void listUpdate(Object obj, TypeMessage message, int id) {
+        if (message != null) {
+            Flight flight = (Flight) obj;
+            switch (message) {
+                case addFlight:
+                    listFlights.add(flight);
+                    break;
+                case editFlight:
+                    int index = -1;
+                    for (int j = 0; j < listFlights.size(); j++) {
+                        if (listFlights.get(j).getId() == id) {
+                            index = j;
+                            break;
+                        }
+                    }
+                    listFlights.set(index, flight);
+                    break;
+                case deleteFlight:
+                    int indexDelete = -1;
+                    for (int j = 0; j < listFlights.size(); j++) {
+                        if (listFlights.get(j).getId() == id) {
+                            indexDelete = j;
+                            break;
+                        }
+                    }
+                    listFlights.remove(indexDelete);
+                    break;
+                case cannotChage:
+                default:
+                    break;
+            }
+            listFlights(listFlights, "Рейс с ID: " + id + message.getDescription());
+        }
     }
 
     /**
@@ -198,16 +244,14 @@ public class MainSceneController {
      * Метод реагирующий на нажатие кнопки клиентом.
      * Создается новая сцена на кототорой пользователю предложенно
      * заполнить форму добавления нового рейса.
-     * Присутсвуют кнопки добавления рейса и отмены
-     *
-     * @throws IOException ошибка соединения
+     * Присутсвуют кнопки добавления рейса и отмены.
      */
     @FXML
     public void add(ActionEvent actionEvent) {
         Stage newStage = new Stage();
         FXMLLoader addLoader = new FXMLLoader();
         newStage.setTitle(TypeMessage.addFlight.name());
-        URL xmlUrl = getClass().getResource("/sample/fxmlFile/addSample.fxml");
+        URL xmlUrl = getClass().getResource("/addSample.fxml");
         addLoader.setLocation(xmlUrl);
         try {
             Parent newRoot = addLoader.load();
@@ -221,7 +265,7 @@ public class MainSceneController {
         }
         newStage.initModality(Modality.APPLICATION_MODAL);
         AddSampleController controller = addLoader.getController();
-        controller.setStage(newStage,listFlights);
+        controller.setStage(newStage, listFlights);
         newStage.showAndWait();
         if (controller.isOnClick()) {
             try {
@@ -236,7 +280,6 @@ public class MainSceneController {
             }
         }
     }
-
 
     /**
      * Метод реагирующий на нажатие кнопки. Реализует
@@ -289,9 +332,9 @@ public class MainSceneController {
     public void delete(ActionEvent actionEvent) throws IOException {
         int index = tableFlights.getSelectionModel().getSelectedIndex();
         if (index > -1) {
-            Flight obj =  tableFlights.getItems().get(index);
-            tableFlights.getItems().remove(index);
-            client.receivingMessage(TypeMessage.deleteFlight, obj,obj.getId());
+            Flight obj = tableFlights.getItems().get(index);
+            // tableFlights.getItems().remove(index);
+            client.receivingMessage(TypeMessage.deleteFlight, obj, obj.getId());
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("No Selection");
@@ -316,7 +359,7 @@ public class MainSceneController {
         Stage editStage = new Stage();
         FXMLLoader editLoader = new FXMLLoader();
         editStage.setTitle(TypeMessage.editFlight.name());
-        URL editURL = getClass().getResource("/sample/fxmlFile/editSample.fxml");
+        URL editURL = getClass().getResource("/editSample.fxml");
         editLoader.setLocation(editURL);
         Parent root = editLoader.load();
         Scene editScene = new Scene(root);
@@ -328,7 +371,7 @@ public class MainSceneController {
             Flight flightEdit = tableFlights.getSelectionModel().getSelectedItem();
             controller.setEditFlight(flightEdit);
             editStage.showAndWait();
-            client.receivingMessage( TypeMessage.editFlight,flightEdit, flightEdit.getId());
+            client.receivingMessage(TypeMessage.editFlight, flightEdit, flightEdit.getId());
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("No Selection");
@@ -338,6 +381,10 @@ public class MainSceneController {
         }
     }
 
+    /**
+     * Метод запускающийся при старте приложения и отправляющий команду серверу о возврате списка рейсов.
+     * @param stage - каркас.
+     */
     public void start(Stage stage) {
         this.stage = stage;
         Flight obj = new Flight();
@@ -354,11 +401,17 @@ public class MainSceneController {
         }
     }
 
+    /**
+     * Метод запрашивающий полный список у сервера.
+     */
     @FXML
     public void getFlights(ActionEvent actionEvent) {
         start(stage);
     }
 
+    /**
+     * Метод поиска подстроки в строке.
+     */
     @FXML
     public void search(ActionEvent actionEvent) {
         List<Flight> listSearch = new ArrayList<Flight>();
@@ -388,19 +441,17 @@ public class MainSceneController {
                     }
                 }
             }
-            if (listSearch.size()!=0) {
+            if (listSearch.size() != 0) {
                 listFlights(listSearch, "Поиск по запросу " + searchString + " прошел успешно...");
             } else
                 listFlights(listSearch, "Поиск по запросу " + searchString + " не нашел ни одного совпадения...");
         }
     }
 
-
-
-   /* private int eSearch(String[] mas, String objSearch){
-
-    }*/
-
+    /**
+     * Метод проверяющий было ли введено значение в поле поиска.
+     * @return если было что то введено - treu, нет - false.
+     */
     private boolean isClick() {
         String messageError = "";
         if (searchField.getText().length() == 0) {

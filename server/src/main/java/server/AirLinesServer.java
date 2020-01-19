@@ -8,8 +8,9 @@ import general.TypeMessage;
 import gsonConverter.CustomConverter;
 import gsonConverter.CustomConverterFlight;
 import gsonConverter.CustomConverterRoute;
-import request.GeneralRequest;
-import request.Request;
+import request.GeneralMessage;
+import request.Message;
+
 
 import java.io.*;
 import java.net.Socket;
@@ -23,13 +24,17 @@ public class AirLinesServer implements ControlInterface {
     List fly = new ArrayList<AirLinesServer>();
     int i = 0;
     public int pos;
-    private  static Socket  Dialog;
+    private static Socket Dialog;
     private HashMap flights = new HashMap();
-    public AirLinesServer(){}
-    public AirLinesServer(Socket client){
+
+    public AirLinesServer() {
+    }
+
+    public AirLinesServer(Socket client) {
         AirLinesServer.Dialog = client;
     }
-    public AirLinesServer(Socket client,ArrayList<AirLinesServer> arrayList,HashMap hashMap){
+
+    public AirLinesServer(Socket client, ArrayList<AirLinesServer> arrayList, HashMap hashMap) {
         AirLinesServer.Dialog = client;
         fly = arrayList;
         flights = hashMap;
@@ -40,59 +45,62 @@ public class AirLinesServer implements ControlInterface {
         try {
             TypeMessage typeMessage;
             AirLinesServer airLinesServer = null;
-            String json ="";
+            String json = "";
             String getFlight;
             DataOutputStream out = new DataOutputStream(Dialog.getOutputStream());
             DataInputStream in = new DataInputStream(Dialog.getInputStream());
             System.out.println("out created");
             System.out.println("in created");
-            Gson  gson = new GsonBuilder()
+            Gson gson = new GsonBuilder()
                     .setPrettyPrinting()
-                    .registerTypeAdapter(GeneralRequest.class, new CustomConverter())
+                    .registerTypeAdapter(GeneralMessage.class, new CustomConverter())
                     .registerTypeAdapter(Flight.class, new CustomConverterFlight())
                     .registerTypeAdapter(Route.class, new CustomConverterRoute())
                     .create();
-            while (!Dialog.isClosed()){
+            while (!Dialog.isClosed()) {
                 Flight journal = new Flight();
                 json = in.readUTF();
-                Request request =gson.fromJson(json,GeneralRequest.class);
-                switch(request.getMessage()) {
-                    case "getFlight":
+                Message request = gson.fromJson(json, GeneralMessage.class);
+                switch (request.getMessage()) {
+                    case getFlight:
                         getFlight = new Gson().toJson(flights);
                         out.writeUTF(getFlight);
                         out.flush();
                         System.out.println("Сервер отправи журнал");
                         break;
-                    case "deleteFlight":
+                    case deleteFlight:
                         i = request.getIndex();
                         journal = (Flight) flights.get(i);
-                        if(journal.isVariability()==false){
+                        if (journal.isVariability() == false) {
                             flights.remove(i);
-                        }else {
+                        } else {
                             out.writeUTF(String.valueOf(TypeMessage.objectIsBusy));
-                            out.flush(); }
+                            out.flush();
+                        }
                         getFlight = new Gson().toJson(flights);
                         out.writeUTF(getFlight);
                         out.flush();
                         airLinesServer.Update();
                         break;
-                    case "addFlight":
+                    case addFlight:
                         Flight flight = (Flight) request.getObject();
-                        flights.put(flight.getId(),flight);
+                        flights.put(flight.getId(), flight);
                         airLinesServer.Update();
                         break;
-                    case "editFlight":
-                        Flight flightEdit=(Flight)request.getObject();
-                        if(flightEdit.isVariability()==false) {
+                    case editFlight:
+                        Flight flightEdit = (Flight) request.getObject();
+                        if (flightEdit.isVariability() == false) {
                             flightEdit.isVariabilitytrue();
                             flights.replace(flightEdit.getId(), flightEdit);
-                        }else{ out.writeUTF(String.valueOf(TypeMessage.objectIsBusy));}
+                        } else {
+                            out.writeUTF(String.valueOf(TypeMessage.objectIsBusy));
+                        }
                         getFlight = new Gson().toJson(flights);
                         out.writeUTF(getFlight);
                         out.flush();
                         airLinesServer.Update();
                         break;
-                    case "TypeMessage.quit":
+                    case quit:
                         in.close();
                         out.close();
                         Dialog.close();
@@ -102,11 +110,12 @@ public class AirLinesServer implements ControlInterface {
             e.printStackTrace();
         }
     }
+
     @Override
     public void Update() throws IOException {
         DataOutputStream out = new DataOutputStream(Dialog.getOutputStream());
         DataInputStream in = new DataInputStream(Dialog.getInputStream());
-        for(Object o:fly){
+        for (Object o : fly) {
             AirLinesServer airLinesServer = (AirLinesServer) o;
             String getFlight = new Gson().toJson(flights);
             try {

@@ -3,7 +3,11 @@ package request;
 import general.Flight;
 import general.TypeMessage;
 
+/**
+ * Интерфейс с сообщением , с объектом и индексом.
+ */
 public interface Message {
+
     /**
      * Сообщение запроса
      */
@@ -19,14 +23,14 @@ public interface Message {
     /**
      * Метод возвращающий объект запроса
      */
-    Flight getObject();
+    Object getObject();
 
     /**
      * Метод изменяющий объект запроса.
      *
      * @param object объект запроса
      */
-    void setObject(Flight object);
+    void setObject(Object object);
 
     /**
      * Метод возвращающий индекс запроса.

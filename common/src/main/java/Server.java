@@ -15,11 +15,15 @@ public class Server {
             String port=property.getProperty("may.port");
             try (ServerSocket serverSocket = new ServerSocket(Integer.parseInt(port))) {
                 while (true) {
+                    System.out.println("Сервер подключен...");
+                    System.out.println("Ожидает клиента...");
                     Socket clientSocket = serverSocket.accept();
+                    System.out.println("Клиент подключен...");
                     Runnable r = new ThreadedHandler(clientSocket);
                     Thread thread = new Thread(r);
                     thread.start();
                 }
+
             }
         } catch (IOException ex) {
             ex.printStackTrace();

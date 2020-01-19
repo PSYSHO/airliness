@@ -7,23 +7,29 @@ import general.TravelCities;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.stage.Stage;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
-
+/*import javax.swing.text.StringContent;
+import javax.xml.soap.Node;
+import java.awt.*;
+import java.text.DateFormat;*/
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+/*import static com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type.Node;*/
 
-
+/**
+ * Класс-контролер отвечающий за окно добавления нового элемента.
+ *
+ * @author Kashkinov Sergeu
+ */
 public class AddSampleController {
     private DateTimeFormatter formatter;
     private Stage stage;
@@ -57,10 +63,18 @@ public class AddSampleController {
     @FXML
     private ComboBox<String> to;
 
+    /**
+     * Метод возвращающий созданный объект.
+     */
     public Flight getFlight() {
         return flight;
     }
 
+    /**
+     * Метод возвращающий значение списка String, со значением всех возможных городов отправления.
+     *
+     * @return список гороов.
+     */
     private ArrayList<String> getMasNameTown(){
         ArrayList<String> masNameTown=new ArrayList<String>();
         for(TravelCities element: TravelCities.values()){
@@ -68,6 +82,7 @@ public class AddSampleController {
         }
         return masNameTown;
     }
+
     /**
      * Инициализирует ComboBox элементами типа Airbus,
      * инициализирует formatter для нужного мне перевода из
@@ -78,7 +93,9 @@ public class AddSampleController {
     private void initialize() {
         comboAirbus.setItems(FXCollections.observableArrayList(Airbus.values()));
         from.setItems(FXCollections.observableArrayList(getMasNameTown()));
+        from.setEditable(true);
         to.setItems(FXCollections.observableArrayList(getMasNameTown()));
+        to.setEditable(true);
         formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         StringConverter<Date> convertDate = new StringConverter<Date>() {
@@ -108,12 +125,20 @@ public class AddSampleController {
         };
     }
 
+    /**
+     * Метод принимающий значения каркаса и исходного списка.
+     *
+     * @param stage - каркас.
+     * @param oldFlights - исходный список.
+     */
     public void setStage(Stage stage,List<Flight> oldFlights) {
         this.stage = stage;
         this.oldFlights=oldFlights;
     }
 
-    @FXML
+    /**
+     * Метод вызывающий закрытие окна.
+     */
     public void cancel(javafx.event.ActionEvent actionEvent) {
         stage.close();
     }
@@ -134,6 +159,10 @@ public class AddSampleController {
             flight.setDeparture(new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(dateString));
             flight.setRoute(new Route(from.getValue(), to.getValue()));
             flight.setTravelTime(Integer.parseInt(travelTimeMinutes.getText()));
+            /*if(!from.getEditor().getText().equals("")){
+                fromItems.add(from.getEditor().getText());
+                System.out.println(from.getEditor().getText());
+            }*/
             stage.close();
             flag = true;
         }
@@ -147,47 +176,46 @@ public class AddSampleController {
     private boolean inputCheck() {
         String errorMessage = "";
         if ((id.getText() == null) || (id.getText().length() == 0)) {
-            errorMessage += "Empty field Id";
+            errorMessage += "Незаполнено поле ID";
         } else {
-
             try {
                 if(searchId(Integer.parseInt(id.getText()))){
-                    errorMessage += "Id value is repeated";
+                    errorMessage += "Значение поля Id повторяется";
                 }
             } catch (NumberFormatException e) {
-                errorMessage += "Wrong Id field number input format";
+                errorMessage += "Неверный формат записи поля Id";
             }
         }
 
         if (comboAirbus.getValue() == null) {
-            errorMessage += "Empty field Airbus";
+            errorMessage += "Невыбрано значение поля Airbus";
         }
         if ( (datePicker.getValue() == null) || ((time.getText() == null) || (time.getText().length() == 0))) {
-            errorMessage += "Empty field Date or Time";
+            errorMessage += "Невыбрано значение поля даты или времени";
         } else {
             try {
                 String dateString = datePicker.getValue().format(formatter) + " " + time.getText();
                 Date date = new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(dateString);
             } catch (ParseException e) {
-                errorMessage += "Wrong date and time format";
+                errorMessage += "Неверный формат записи поля времени";
             }
         }
         if (from.getValue() == null) {
-            errorMessage += "Empty field From";
+            errorMessage += "Невыбран пункт отправления";
         }
         if (to.getValue() == null) {
-            errorMessage += "Empty field To";
+            errorMessage += "Невыбран пункт назначения";
         }
         if (from.getValue().equals(to.getValue())){
-            errorMessage += "Сan't be the same way";
+            errorMessage += "Пункты отправления и назначения не должны повторяться";
         }
         if ((travelTimeMinutes.getText() == null) || (travelTimeMinutes.getText().length() == 0)) {
-            errorMessage += "Empty field Id";
+            errorMessage += "Невведено значение в поле продолжительность полета";
         } else {
             try {
                 Integer.parseInt(travelTimeMinutes.getText());
             } catch (NumberFormatException e) {
-                errorMessage += "Wrong Id field number input format";
+                errorMessage += "Неверный формат поля продолжительность полета";
             }
         }
         if (errorMessage.length() == 0) {
@@ -195,8 +223,8 @@ public class AddSampleController {
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.initOwner(stage);
-            alert.setTitle("Invalid Fields");
-            alert.setHeaderText("Please correct invalid fields");
+            alert.setTitle("Неверно введеные значения");
+            alert.setHeaderText("Пожалуйста, повторите ввод еще раз");
             alert.setContentText(errorMessage);
             alert.showAndWait();
 

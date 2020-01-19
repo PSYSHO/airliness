@@ -5,22 +5,24 @@ import com.google.gson.GsonBuilder;
 import general.Airbus;
 import general.Flight;
 import general.Route;
+import general.TypeMessage;
 import request.GeneralMessage;
+import request.ListFromServer;
 import request.Message;
 import gsonConverter.CustomConverter;
 import gsonConverter.CustomConverterFlight;
 import gsonConverter.CustomConverterRoute;
+import request.MessageFromServer;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.*;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class ThreadedHandler implements Runnable {
     private Socket incoming;
-    private List<Flight> flights=getFlights();
+    private List<Flight> flights = getFlights();
 
 
     public ThreadedHandler(Socket incoming) {
@@ -30,9 +32,9 @@ public class ThreadedHandler implements Runnable {
     @Override
     public void run() {
         try (DataOutputStream write = new DataOutputStream(
-                                                incoming.getOutputStream());
+                incoming.getOutputStream());
              DataInputStream read = new DataInputStream(
-                                                incoming.getInputStream())
+                     incoming.getInputStream())
         ) {
             while (true) {
                 while (read.available() == 0) {
@@ -47,7 +49,7 @@ public class ThreadedHandler implements Runnable {
                 }
                 String getFlightsJson;
                 // собственный сериализатор десериализатор
-                Gson  gson = new GsonBuilder()
+                Gson gson = new GsonBuilder()
                         .setPrettyPrinting()
                         .registerTypeAdapter(GeneralMessage.class, new CustomConverter())
                         .registerTypeAdapter(Flight.class, new CustomConverterFlight())
@@ -58,51 +60,56 @@ public class ThreadedHandler implements Runnable {
                 switch (message.getMessage()) {
                     case getFlight:
                         //сериализуем список рейсов и отправляем клиенту
-                        getFlightsJson = new Gson().toJson(flights);
+                        MessageFromServer messageFromServer = new ListFromServer(TypeMessage.getFlight, flights);
+                        getFlightsJson = new Gson().toJson(messageFromServer);
                         write.writeUTF(getFlightsJson);
                         write.flush();
                         break;
-
                     case deleteFlight:
                         //получаем из запроса индекс элемента на удаление
-                        int i= message.getIndex();
+                        int i = message.getIndex();
+                        Flight deleteFlight = new Flight();
                         //удаяем его из списка
-                        for(int j=0;j<flights.size(); j++) {
-                            if(flights.get(j).getId()==i){
+                        for (int j = 0; j < flights.size(); j++) {
+                            if (flights.get(j).getId() == i) {
+                                deleteFlight = flights.get(j);
                                 flights.remove(j);
                                 break;
                             }
                         }
                         //получившийся список сериализуем и отправляем клиенту
-                        getFlightsJson = new Gson().toJson(flights);
+                        Message message1 = new GeneralMessage(TypeMessage.deleteFlight, deleteFlight, i);
+                        getFlightsJson = gson.toJson(message1);
                         write.writeUTF(getFlightsJson);
                         write.flush();
                         break;
                     case editFlight:
                         //получаем объект на изменение
-                        Flight flightEdit= message.getObject();
+                        Flight flightEdit = (Flight) message.getObject();
                         //получаем его индекс
-                        int indexEdit= message.getIndex();
+                        int idEdit = message.getIndex();
                         //сортируем список чтобы индекс не отличался от сортированного списка клиента
                         Collections.sort(flights);
                         //изменяем объект списка
-                        for(int j=0;j<flights.size(); j++) {
-                            if(flights.get(j).getId()==indexEdit){
-                                flights.set(j,flightEdit);
+                        for (int j = 0; j < flights.size(); j++) {
+                            if (flights.get(j).getId() == idEdit) {
+                                flights.set(j, flightEdit);
                                 break;
                             }
                         }
                         //flights.set(indexEdit,flightEdit);
                         //сериализуем список и отправляем клиенту
-                        getFlightsJson = new Gson().toJson(flights);
+                        Message message2 = new GeneralMessage(TypeMessage.editFlight, flightEdit, idEdit);
+                        getFlightsJson = gson.toJson(message2);
                         write.writeUTF(getFlightsJson);
                         write.flush();
                         break;
                     case addFlight:
-                        Flight flightAdd=(Flight) message.getObject();
+                        Flight flightAdd = (Flight) message.getObject();
                         flights.add(flightAdd);
                         Collections.sort(flights);
-                        getFlightsJson = new Gson().toJson(flights);
+                        Message message3 = new GeneralMessage(TypeMessage.addFlight, flightAdd, flightAdd.getId());
+                        getFlightsJson = gson.toJson(message3);
                         write.writeUTF(getFlightsJson);
                         write.flush();
                         break;

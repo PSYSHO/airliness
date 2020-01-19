@@ -6,7 +6,12 @@ import general.Route;
 
 import java.lang.reflect.Type;
 
+/**
+ * Класс для сериализиции и десериалиции обекта типа Route
+ * @author Kashkinov Sergey
+ */
 public class CustomConverterRoute implements JsonSerializer<Route>, JsonDeserializer<Route> {
+
     @Override
     public Route deserialize(JsonElement json, java.lang.reflect.Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject jsonObject=json.getAsJsonObject();

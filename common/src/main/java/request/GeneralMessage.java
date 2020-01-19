@@ -12,14 +12,14 @@ public class GeneralMessage implements Message {
     /**
      * Поле объекта запроса
      */
-    private Flight object;
+    private Object object;
 
     /**
      * Поле индекса запроса
      */
     private int index;
 
-    public GeneralMessage(TypeMessage message, Flight object, int index){
+    public GeneralMessage(TypeMessage message, Object object, int index){
         this.message=message;
         this.object=object;
         this.index=index;
@@ -51,7 +51,7 @@ public class GeneralMessage implements Message {
      * то передается объект по умолчанию.
      */
     @Override
-    public Flight getObject() {
+    public Object getObject() {
         return object;
     }
 
@@ -61,7 +61,7 @@ public class GeneralMessage implements Message {
      * @param object объект запроса
      */
     @Override
-    public void setObject(Flight object) {
+    public void setObject(Object object) {
         this.object=object;
     }
 

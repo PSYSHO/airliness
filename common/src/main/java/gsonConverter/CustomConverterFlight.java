@@ -4,7 +4,6 @@ import com.google.gson.*;
 import general.Airbus;
 import general.Flight;
 import general.Route;
-import request.Request;
 
 import java.lang.reflect.Type;
 import java.util.Date;
@@ -18,9 +17,9 @@ public class CustomConverterFlight implements JsonSerializer<Flight>, JsonDeseri
     /**
      * Дессериализия JsonObject объекта в объект типа Flight
      *
-     * @param json
-     * @param type
-     * @param context
+     * @param json - объект json
+     * @param type - тип вкоторый преобразуем
+     * @param context - контекст испозьзования
      * @return возвращиет объект типа Flight
      */
     @Override
