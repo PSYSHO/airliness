@@ -29,11 +29,18 @@ public class Server {
         if(file.exists());else journal.save(path,flightMap);
         journal.load(path, flightMap);
         List clientList = new ArrayList<AirLinesServer>();
-        try (ServerSocket server = new ServerSocket(Integer.parseInt(port))
-        ) {
-            Thread controll = new Thread(new ServerControll(server, flightMap, path));
-            controll.start();
+        try (ServerSocket server = new ServerSocket(Integer.parseInt(port))) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             while (!server.isClosed()) {
+                System.out.println("Сервер подключен...");
+                System.out.println("Ожидает клиента...");
+                if(br.ready()){System.out.println("Main server found messages");}
+                String servercomand = br.readLine();
+                if (servercomand.equalsIgnoreCase("quit")){
+                    System.out.println("Main server exiting...");
+                    journal.save(path,flightMap);
+                    server.close();
+                }
                 Thread client = new Thread(new AirLinesServer(server.accept(), (ArrayList<AirLinesServer>) clientList, flightMap));
                 client.start();
                 System.out.println("accepted");
