@@ -2,6 +2,7 @@ package general;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+/*import com.sun.org.apache.bcel.internal.util.BCELifier;*/
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -14,6 +15,7 @@ import java.util.Map;
 
 public class Journal {
     List<Flight> journal = new ArrayList<Flight>();
+
     public Journal(){}
 
     public List getJournal() {
@@ -34,15 +36,14 @@ public class Journal {
     }
     public Map load(String path, Map map){
         Journal journal = new Journal();
-        Gson gson = new Gson();
         try {
-            FileReader fileReader = new FileReader("journal.json");
-            journal=gson.fromJson(fileReader,Journal.class);
+            FileReader fileReader = new FileReader(path);
+            journal=new Gson().fromJson(fileReader,Journal.class);
             fileReader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        int k = journal.getSize();
+        //int k = journal.getSize();
         /*for (int i = 0; i < k; i++) {
             List list = journal.getJournal();
             map.put(i,list.get(i));
@@ -61,14 +62,14 @@ public class Journal {
         }
     }
     public void save(String path,Map map){
-        List flights = new ArrayList<Flight>();
+        Journal journal=new Journal();
         for (Object flight : map.values()) {
-            flights.add((Flight) flight);
+            journal.journal.add((Flight) flight);
         }
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try {
             FileWriter fileWriter = new FileWriter("journal.json");
-            fileWriter.write(gson.toJson(flights));
+            fileWriter.write(gson.toJson(journal));
             fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();

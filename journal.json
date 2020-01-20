@@ -1,5 +1,5 @@
 {
-"journal":[
+  "journal": [
     {
       "id": 1,
       "idAirbus": "Airbius_A300",
@@ -9,29 +9,29 @@
       },
       "departure": "Oct 11, 2019, 11:23:00 AM",
       "travelTimeMinutes": 50,
-      "changes": false
+      "variability": true
     },
     {
       "id": 2,
-      "idAirbus": "Airbius_A300",
+      "idAirbus": "boing_777",
       "route": {
-        "pointOfDeparture": "NewYork",
-        "pointOfArrival": "York"
+        "pointOfDeparture": "Санкт-Петербург",
+        "pointOfArrival": "Самара"
       },
-      "departure": "Dec 11, 2019, 11:23:00 AM",
-      "travelTimeMinutes": 45,
-      "changes": false
+      "departure": "Jan 9, 2020, 12:23:00 PM",
+      "travelTimeMinutes": 1231,
+      "variability": false
     },
     {
       "id": 3,
       "idAirbus": "boing_737",
       "route": {
-        "pointOfDeparture": "OMSK",
-        "pointOfArrival": "OMSK"
+        "pointOfDeparture": "Санкт-Петербург",
+        "pointOfArrival": "Зальцбург"
       },
-      "departure": "Dec 11, 2019, 11:23:00 AM",
+      "departure": "Dec 11, 2019, 11:20:00 AM",
       "travelTimeMinutes": 70,
-      "changes": false
+      "variability": true
     }
-]
+  ]
 }

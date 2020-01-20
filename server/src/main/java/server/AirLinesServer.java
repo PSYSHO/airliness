@@ -80,7 +80,6 @@ public class AirLinesServer implements ControlInterface {
                         getFlight = new Gson().toJson(message1);
                         out.writeUTF(getFlight);
                         out.flush();
-                        /* airLinesServer.Update(message1);*/
                         Update(message1,gson);
                         break;
                     case addFlight:
@@ -115,7 +114,7 @@ public class AirLinesServer implements ControlInterface {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Клиент закончил работу...");
         }
     }
 

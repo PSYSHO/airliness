@@ -75,9 +75,9 @@ public class AddSampleController {
      *
      * @return список гороов.
      */
-    private ArrayList<String> getMasNameTown(){
-        ArrayList<String> masNameTown=new ArrayList<String>();
-        for(TravelCities element: TravelCities.values()){
+    private ArrayList<String> getMasNameTown() {
+        ArrayList<String> masNameTown = new ArrayList<String>();
+        for (TravelCities element : TravelCities.values()) {
             masNameTown.add(element.getNameTown());
         }
         return masNameTown;
@@ -128,12 +128,12 @@ public class AddSampleController {
     /**
      * Метод принимающий значения каркаса и исходного списка.
      *
-     * @param stage - каркас.
+     * @param stage      - каркас.
      * @param oldFlights - исходный список.
      */
-    public void setStage(Stage stage,List<Flight> oldFlights) {
+    public void setStage(Stage stage, List<Flight> oldFlights) {
         this.stage = stage;
-        this.oldFlights=oldFlights;
+        this.oldFlights = oldFlights;
     }
 
     /**
@@ -179,7 +179,7 @@ public class AddSampleController {
             errorMessage += "Незаполнено поле ID";
         } else {
             try {
-                if(searchId(Integer.parseInt(id.getText()))){
+                if (searchId(Integer.parseInt(id.getText()))) {
                     errorMessage += "Значение поля Id повторяется";
                 }
             } catch (NumberFormatException e) {
@@ -190,12 +190,23 @@ public class AddSampleController {
         if (comboAirbus.getValue() == null) {
             errorMessage += "Невыбрано значение поля Airbus";
         }
-        if ( (datePicker.getValue() == null) || ((time.getText() == null) || (time.getText().length() == 0))) {
+        if ((datePicker.getValue() == null) || ((time.getText() == null) || (time.getText().length() == 0))) {
             errorMessage += "Невыбрано значение поля даты или времени";
         } else {
             try {
-                String dateString = datePicker.getValue().format(formatter) + " " + time.getText();
-                Date date = new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(dateString);
+                String dateTimeString = datePicker.getValue().format(formatter) + " " + time.getText();
+                Date date = new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(dateTimeString);
+                String[] timeString = time.getText().split(":");
+                int hour = Integer.parseInt(timeString[0]);
+                int minute = Integer.parseInt(timeString[1]);
+                if (!((hour >= 0 && hour <= 24) && (minute >= 0 && minute <= 60)))
+                    errorMessage += "Неверно записано время";
+                String[] dateString = datePicker.getValue().format(formatter).split("\\.");
+                int day = Integer.parseInt(dateString[0]);
+                int mouth = Integer.parseInt(dateString[1]);
+                int year = Integer.parseInt(dateString[2]);
+                if (!((day >= 0 && day <= 31) && (mouth >= 1 && mouth <= 12) && (year >= 1970 && year <= 3000)))
+                    errorMessage += "Неверно записано дата";
             } catch (ParseException e) {
                 errorMessage += "Неверный формат записи поля времени";
             }
@@ -206,7 +217,7 @@ public class AddSampleController {
         if (to.getValue() == null) {
             errorMessage += "Невыбран пункт назначения";
         }
-        if (from.getValue().equals(to.getValue())){
+        if (from.getValue().equals(to.getValue())) {
             errorMessage += "Пункты отправления и назначения не должны повторяться";
         }
         if ((travelTimeMinutes.getText() == null) || (travelTimeMinutes.getText().length() == 0)) {
@@ -236,9 +247,9 @@ public class AddSampleController {
     /**
      * Поиск повторяющийхс уникальных ключей
      */
-    public boolean searchId(int id){
-        for(Flight flight:oldFlights){
-            if (flight.getId()==id){
+    public boolean searchId(int id) {
+        for (Flight flight : oldFlights) {
+            if (flight.getId() == id) {
                 return true;
             }
         }

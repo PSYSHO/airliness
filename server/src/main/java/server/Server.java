@@ -8,6 +8,8 @@ import general.Journal;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
 import java.util.*;
 
 public class Server {
@@ -18,43 +20,62 @@ public class Server {
 
     public static void main(String[] args) throws IOException {
         Journal journal = new Journal();
-        Map<Integer, Flight> flightMap = new HashMap<Integer,Flight>();
-        Gson gson = new Gson();
+        Map<Integer, Flight> flightMap = new HashMap<Integer, Flight>();
         FileInputStream fil = new FileInputStream("common/src/main/java/general/config.properties");
         Properties property = new Properties();
         property.load(fil);
         String port = property.getProperty("may.port");
         String path = property.getProperty("may.path");
-        File file = new File("journal.json");
-        if(file.exists());else journal.save(path,flightMap);
+        File file = new File(path);
+        if (file.exists()) ;
+        else
+            journal.save(path, flightMap);
         journal.load(path, flightMap);
         List clientList = new ArrayList<AirLinesServer>();
         try (ServerSocket server = new ServerSocket(Integer.parseInt(port))) {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            while (!server.isClosed()) {
-                System.out.println("Сервер подключен...");
-                System.out.println("Ожидает клиента...");
-                if (br.ready()) {
-                    System.out.println("Main server found messages");
+            Thread waitingExit = new Thread(new Runnable()  {
+                @Override
+                public void run() {
+                    boolean flag = true;
+                    while(flag) {
+                        try {
+                            /*if (br.ready()) {*/
+                                        /*System.out.println("Поток читает сообщение...");
+                                        String servercomand = "";
+                                        servercomand = br.readLine();*/
+                            if (br.readLine().equalsIgnoreCase("quit")) {
+                                System.out.println("Main server exiting...");
+                                journal.save(path, flightMap);
+                                flag = false;
+                                server.close();
+                            } else
+                                System.out.println("Неизвестная команда...");
+                            /*}*/
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    System.out.println("Поток закончил свою работу...");
                 }
-                String servercomand = br.readLine();
-                if (servercomand.equalsIgnoreCase("quit")) {
-                    System.out.println("Main server exiting...");
-                    journal.save(path, flightMap);
-                    server.close();
-                }
-            }
-                Thread controll = new Thread(new ServerControll(server, flightMap, path));
-                controll.start();
+            });
+            waitingExit.start();
+            System.out.println("Сервер подключен...");
             while (!server.isClosed()) {
-                Thread client = new Thread(new AirLinesServer(server.accept(),  clientList, flightMap));
-                client.start();
-                System.out.println("accepted");
-                clientList.add(client);
+                try {
+                    System.out.println("Ожидает клиента...");
+                    Socket socketClient = server.accept();
+                    Thread client = new Thread(new AirLinesServer(socketClient, (ArrayList<AirLinesServer>) clientList, flightMap));
+                    client.start();
+                    System.out.println("accepted");
+                    clientList.add(client);
+                } catch (SocketException e) {
+                }
             }
         } catch (IOException ex) {
+            ex.printStackTrace();
         }
-
+        System.out.println("Cервер закончил свою работу...");
 //todo сделать генераию файла в случае если его нет
     }
 }

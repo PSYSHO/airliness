@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Класс-контроллер окна изменения элемента.
@@ -55,8 +56,8 @@ public class EditSampleController {
      *
      * @return список гороов.
      */
-    private ArrayList<String> getMasNameTown(){
-        ArrayList<String> masNameTown=new ArrayList<String>();
+    private List<String> getMasNameTown(){
+        List<String> masNameTown=new ArrayList<String>();
         for(TravelCities element: TravelCities.values()){
             masNameTown.add(element.getNameTown());
         }
@@ -184,8 +185,19 @@ public class EditSampleController {
             errorMessage += "Невыбрано значение поля даты или времени";
         } else {
             try {
-                String dateString = datePicker.getValue().format(formatter) + " " + time.getText();
-                Date date = new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(dateString);
+                String dateTimeString = datePicker.getValue().format(formatter) + " " + time.getText();
+                Date date = new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(dateTimeString);
+                String[] timeString = time.getText().split(":");
+                int hour = Integer.parseInt(timeString[0]);
+                int minute = Integer.parseInt(timeString[1]);
+                if (!((hour >= 0 && hour <= 24) && (minute >= 0 && minute <= 60)))
+                    errorMessage += "Неверно записано время";
+                String[] dateString = datePicker.getValue().format(formatter).split("\\.");
+                int day = Integer.parseInt(dateString[0]);
+                int mouth = Integer.parseInt(dateString[1]);
+                int year = Integer.parseInt(dateString[2]);
+                if (!((day >= 0 && day <= 31) && (mouth >= 1 && mouth <= 12) && (year >= 1970 && year <= 3000)))
+                    errorMessage += "Неверно записано дата";
             } catch (ParseException e) {
                 errorMessage += "Неверный формат записи поля времени";
             }
