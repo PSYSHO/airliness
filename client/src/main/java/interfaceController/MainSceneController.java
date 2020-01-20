@@ -31,9 +31,18 @@ import java.util.*;
  * @author Kashkinov Sergeu
  */
 public class MainSceneController {
+
+    /** Объект класса клиент взаимодействующий  сервером. */
     private Client client;
+
+    /** Объект каркаса для работы с каркасом главной формы. */
     private Stage stage;
+
+    /** Список рейсов. */
     private List<Flight> listFlights;
+
+    /** Переменная показывающая, что пользователь зашел в поиск. */
+    private boolean flagSearch = false;
 
     @FXML
     private Button search;
@@ -115,7 +124,7 @@ public class MainSceneController {
                 return getTimeFromDate(param);
             }
         });
-
+        System.out.println("Список рейсов обновлен...");
     }
 
     /**
@@ -145,7 +154,6 @@ public class MainSceneController {
      * @return возвращает тип StringProperty, преобразованный из типа String
      */
     private StringProperty getRouteTo(TableColumn.CellDataFeatures<Flight, String> param) {
-        System.out.println("getRouteTo");
         return new SimpleStringProperty(param.getValue().getRoute().getPointOfArrival());
     }
 
@@ -158,7 +166,6 @@ public class MainSceneController {
     private StringProperty getDateFromDate(TableColumn.CellDataFeatures<Flight, String> param) {
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
         StringProperty formatDate = new SimpleStringProperty(format.format(param.getValue().getDeparture()));
-        System.out.println(format.format(param.getValue().getDeparture()));
         return formatDate;
     }
 
@@ -171,7 +178,6 @@ public class MainSceneController {
     private StringProperty getTimeFromDate(TableColumn.CellDataFeatures<Flight, String> param) {
         SimpleDateFormat format = new SimpleDateFormat("HH:mm");
         StringProperty formatDate = new SimpleStringProperty(format.format(param.getValue().getDeparture()));
-        System.out.println(format.format(param.getValue().getDeparture()));
         return formatDate;
     }
 
@@ -180,13 +186,18 @@ public class MainSceneController {
      *
      * @param list список рейсов переданного с сервера
      */
-    public void listFlights(List<Flight> list, String message) {
-        labelS.setText(message);
+    public  void listFlights(List<Flight> list, String message) {
         if (list != null) {
             listFlights = list;
             Collections.sort(listFlights);
-            initTableData(FXCollections.observableArrayList(listFlights));
+            if (!flagSearch)
+                initTableData(FXCollections.observableArrayList(listFlights));
+            else {
+                flagSearch = false;
+                searchList();
+            }
         }
+        labelS.setText(message);
     }
 
     /**
@@ -400,10 +411,10 @@ public class MainSceneController {
      */
     public void start(Stage stage) {
         this.stage = stage;
-        Flight obj = new Flight();
         int index = -1;
         try {
-            client.receivingMessage(TypeMessage.getFlight, obj, index);
+            client.receivingMessage(TypeMessage.getFlight, null, index);
+            flagSearch = false;
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("No connection");
@@ -427,6 +438,10 @@ public class MainSceneController {
      */
     @FXML
     public void search(ActionEvent actionEvent) {
+        searchList();
+    }
+
+    private void searchList(){
         List<Flight> listSearch = new ArrayList<Flight>();
         if (isClick()) {
             String searchString = searchField.getText();
@@ -458,6 +473,7 @@ public class MainSceneController {
                 listFlights(listSearch, "Поиск по запросу " + searchString + " прошел успешно...");
             } else
                 listFlights(listSearch, "Поиск по запросу " + searchString + " не нашел ни одного совпадения...");
+            flagSearch = true;
         }
     }
 

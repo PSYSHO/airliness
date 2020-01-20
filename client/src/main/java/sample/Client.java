@@ -12,14 +12,14 @@ import javafx.application.Platform;
 import request.GeneralMessage;
 import request.ListFromServer;
 import request.Message;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
+
+import java.io.*;
 import java.net.Socket;
+
 import com.google.gson.*;
 import request.MessageFromServer;
 import interfaceController.MainSceneController;
+
 import java.util.Properties;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -51,7 +51,8 @@ public class Client {
      * @param controller - коттролер главного окна интерфейса.
      */
     public Client(MainSceneController controller) throws IOException {
-        fil = new FileInputStream("common/src/main/java/general/config.properties");
+        fil = new FileInputStream("config.properties");
+        //InputStream is = Client.class.getClassLoader().getResourceAsStream("config.properties");
         property = new Properties();
         property.load(fil);
         String host = property.getProperty("may.host");
@@ -129,12 +130,19 @@ public class Client {
     }
 }
 
- /**
+/**
  * Заносим в поток ввод серелизованный обект интерфейса Request
  * и по потоку вывода передаем серверу
  * <p>
  * Отправляет запрос на удаление на сервере элемента под определенным индексом
  *
+ * @param message сообщение серверу по обработке данных
+ * @param obj объкт передаваемый для взаимодействия с сервером
+ * @param index номер элемента, который нужно удалить
+ * <p>
+ * Класс реализующий десериализацию списка элементов в объект
+ * <p>
+ * Отправляет запрос на удаление на сервере элемента под определенным индексом
  * @param message сообщение серверу по обработке данных
  * @param obj объкт передаваемый для взаимодействия с сервером
  * @param index номер элемента, который нужно удалить

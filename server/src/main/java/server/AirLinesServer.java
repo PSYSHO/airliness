@@ -18,23 +18,23 @@ import java.net.Socket;
 import java.util.*;
 
 public class AirLinesServer implements ControlInterface {
-    List fly = new ArrayList<AirLinesServer>();
-    int i = 0;
-    public int pos;
+
+    private int i = 0;
     private static Socket Dialog;
-    private Map<Integer, Flight> flightsMap = new HashMap<Integer, Flight>();
-    List flights = new ArrayList<Flight>();
+    private volatile Map<Integer, Flight> flightsMap = new HashMap<Integer, Flight>();
+    private volatile List<Flight> flights = new ArrayList<Flight>();
+    private DataOutputStream  out;
+    private DataInputStream  in;
+
+    public DataOutputStream getOut(){
+        return out;
+    }
 
     public AirLinesServer() {
     }
 
-    public AirLinesServer(Socket client) {
+    public AirLinesServer(Socket client, Map<Integer,Flight> map) {
         AirLinesServer.Dialog = client;
-    }
-
-    public AirLinesServer(Socket client, List arrayList, Map map) {
-        AirLinesServer.Dialog = client;
-        fly = arrayList;
         flightsMap = map;
     }
 
@@ -42,12 +42,10 @@ public class AirLinesServer implements ControlInterface {
     public void run() {
         try {
             flights=updateFlights(flightsMap);
-            TypeMessage typeMessage;
-            AirLinesServer airLinesServer = null;
             String json = "";
             String getFlight;
-            DataOutputStream out = new DataOutputStream(Dialog.getOutputStream());
-            DataInputStream in = new DataInputStream(Dialog.getInputStream());
+            out = new DataOutputStream(Dialog.getOutputStream());
+            in = new DataInputStream(Dialog.getInputStream());
             System.out.println("out created");
             System.out.println("in created");
             Gson gson = new GsonBuilder()
@@ -80,7 +78,8 @@ public class AirLinesServer implements ControlInterface {
                         getFlight = new Gson().toJson(message1);
                         out.writeUTF(getFlight);
                         out.flush();
-                        Update(message1,gson);
+                        Server.Update(message1,gson);
+                        Server.setFlights(flightsMap);
                         break;
                     case addFlight:
                         Flight flightAdd = (Flight) message.getObject();
@@ -90,7 +89,8 @@ public class AirLinesServer implements ControlInterface {
                         getFlight = gson.toJson(message2);
                         out.writeUTF(getFlight);
                         out.flush();
-                        Update(message2,gson);
+                        Server.Update(message2,gson);
+                        Server.setFlights(flightsMap);
                         break;
                     case editFlight:
                         Flight flightEdit = (Flight) message.getObject();
@@ -105,7 +105,8 @@ public class AirLinesServer implements ControlInterface {
                         getFlight = gson.toJson(message3);
                         out.writeUTF(getFlight);
                         out.flush();
-                        Update(message3,gson);
+                        Server.Update(message3,gson);
+                        Server.setFlights(flightsMap);
                         break;
                     case quit:
                         in.close();

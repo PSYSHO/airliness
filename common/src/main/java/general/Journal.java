@@ -2,6 +2,7 @@ package general;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+/*import com.sun.org.apache.bcel.internal.util.BCELifier;*/
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -39,11 +40,16 @@ public class Journal {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        //int k = journal.getSize();
+        /*for (int i = 0; i < k; i++) {
+            List list = journal.getJournal();
+            map.put(i,list.get(i));
+        }*/
         for(Flight flight:journal.journal){
             map.put(flight.getId(),flight);
         }
         return map;
-     }
+    }
     public void delete(int index,Map map){
         for(Object o:map.values()){
             if (o==journal.get(index)){
@@ -59,7 +65,7 @@ public class Journal {
         }
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try {
-            FileWriter fileWriter = new FileWriter("journal.json");
+            FileWriter fileWriter = new FileWriter(path);
             fileWriter.write(gson.toJson(journal));
             fileWriter.close();
         } catch (IOException e) {
@@ -82,4 +88,5 @@ public class Journal {
             e.printStackTrace();
         }
     }
+
 }

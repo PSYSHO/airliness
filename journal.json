@@ -2,36 +2,36 @@
   "journal": [
     {
       "id": 1,
-      "idAirbus": "Airbius_A300",
+      "idAirbus": "Airbius_A321",
       "route": {
-        "pointOfDeparture": "Florida",
-        "pointOfArrival": "OMSK"
+        "pointOfDeparture": "Омск",
+        "pointOfArrival": "Магадан"
       },
-      "departure": "Oct 11, 2019, 11:23:00 AM",
+      "departure": "Jan 20, 2020, 1:45:00 PM",
       "travelTimeMinutes": 50,
       "variability": true
     },
     {
-      "id": 2,
-      "idAirbus": "boing_777",
+      "id": 3,
+      "idAirbus": "boing_767",
+      "route": {
+        "pointOfDeparture": "Анапа",
+        "pointOfArrival": "Самара"
+      },
+      "departure": "Jan 1, 2020, 12:00:00 PM",
+      "travelTimeMinutes": 120,
+      "variability": false
+    },
+    {
+      "id": 4,
+      "idAirbus": "Airbius_A3318",
       "route": {
         "pointOfDeparture": "Санкт-Петербург",
         "pointOfArrival": "Самара"
       },
-      "departure": "Jan 9, 2020, 12:23:00 PM",
-      "travelTimeMinutes": 1231,
+      "departure": "Jan 8, 2020, 12:00:00 PM",
+      "travelTimeMinutes": 120,
       "variability": false
-    },
-    {
-      "id": 3,
-      "idAirbus": "boing_737",
-      "route": {
-        "pointOfDeparture": "Санкт-Петербург",
-        "pointOfArrival": "Зальцбург"
-      },
-      "departure": "Dec 11, 2019, 11:20:00 AM",
-      "travelTimeMinutes": 70,
-      "variability": true
     }
   ]
 }

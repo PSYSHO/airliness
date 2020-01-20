@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import general.Flight;
 import general.Journal;
+import request.Message;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -13,44 +14,51 @@ import java.net.SocketException;
 import java.util.*;
 
 public class Server {
-    public Map flightMap = new HashMap();
+    public static Map<Integer, Flight> flightMap;
+    private static List<AirLinesServer> clientList;
 
     public Server() {
     }
 
+    public static void setFlights(Map<Integer, Flight> flightMapUpdate) {
+        flightMap = flightMapUpdate;
+    }
+
+    public static Map<Integer, Flight> getFlights() {
+        return flightMap;
+    }
+
     public static void main(String[] args) throws IOException {
         Journal journal = new Journal();
-        Map<Integer, Flight> flightMap = new HashMap<Integer, Flight>();
-        FileInputStream fil = new FileInputStream("common/src/main/java/general/config.properties");
+        flightMap = new HashMap<Integer, Flight>();
+        FileInputStream fil = new FileInputStream("config.properties");
         Properties property = new Properties();
         property.load(fil);
         String port = property.getProperty("may.port");
         String path = property.getProperty("may.path");
         File file = new File(path);
         if (file.exists()) ;
-        else journal.create();
+        else {
+            journal.create();
+        }
         journal.load(path, flightMap);
-        List clientList = new ArrayList<AirLinesServer>();
+        clientList = new ArrayList<AirLinesServer>();
         try (ServerSocket server = new ServerSocket(Integer.parseInt(port))) {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            Thread waitingExit = new Thread(new Runnable()  {
+            Thread waitingExit = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     boolean flag = true;
-                    while(flag) {
+                    while (flag) {
                         try {
-                            /*if (br.ready()) {*/
-                                        /*System.out.println("Поток читает сообщение...");
-                                        String servercomand = "";
-                                        servercomand = br.readLine();*/
                             if (br.readLine().equalsIgnoreCase("quit")) {
                                 System.out.println("Main server exiting...");
                                 journal.save(path, flightMap);
                                 flag = false;
                                 server.close();
-                            } else
+                            } else {
                                 System.out.println("Неизвестная команда...");
-                            /*}*/
+                            }
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -64,11 +72,13 @@ public class Server {
                 try {
                     System.out.println("Ожидает клиента...");
                     Socket socketClient = server.accept();
-                    Thread client = new Thread(new AirLinesServer(socketClient, (ArrayList<AirLinesServer>) clientList, flightMap));
-                    client.start();
-                    System.out.println("accepted");
+                    AirLinesServer client = new AirLinesServer(socketClient, flightMap);
+                    Thread clientThread = new Thread(client);
+                    clientThread.start();
                     clientList.add(client);
+                    System.out.println("Новый клиент подключен...");
                 } catch (SocketException e) {
+                    e.printStackTrace();
                 }
             }
         } catch (IOException ex) {
@@ -76,6 +86,19 @@ public class Server {
         }
         System.out.println("Cервер закончил свою работу...");
 //todo сделать генераию файла в случае если его нет
+    }
+
+    public static void Update(Message message, Gson gson) throws IOException {
+        for (AirLinesServer client : clientList) {
+            String getFlight;
+            try {
+                getFlight = gson.toJson(message);
+                client.getOut().writeUTF(getFlight);
+                client.getOut().flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
 //todo сделать настройку в пом для клиента и ервера где лежат мейн классы

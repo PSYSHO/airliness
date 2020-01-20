@@ -194,17 +194,17 @@ public class AddSampleController {
             errorMessage += "Невыбрано значение поля даты или времени";
         } else {
             try {
-                String dateTimeString = datePicker.getValue().format(formatter) + " " + time.getText();
-                Date date = new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(dateTimeString);
                 String[] timeString = time.getText().split(":");
+                String[] dateString = datePicker.getValue().format(formatter).split("\\.");
                 int hour = Integer.parseInt(timeString[0]);
                 int minute = Integer.parseInt(timeString[1]);
-                if (!((hour >= 0 && hour <= 24) && (minute >= 0 && minute <= 60)))
-                    errorMessage += "Неверно записано время";
-                String[] dateString = datePicker.getValue().format(formatter).split("\\.");
                 int day = Integer.parseInt(dateString[0]);
                 int mouth = Integer.parseInt(dateString[1]);
                 int year = Integer.parseInt(dateString[2]);
+                String dateTimeString = datePicker.getValue().format(formatter) + " " + time.getText();
+                new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(dateTimeString);
+                if (!((hour >= 0 && hour <= 24) && (minute >= 0 && minute <= 60)))
+                    errorMessage += "Неверно записано время";
                 if (!((day >= 0 && day <= 31) && (mouth >= 1 && mouth <= 12) && (year >= 1970 && year <= 3000)))
                     errorMessage += "Неверно записано дата";
             } catch (ParseException e) {
@@ -241,7 +241,6 @@ public class AddSampleController {
 
             return false;
         }
-
     }
 
     /**

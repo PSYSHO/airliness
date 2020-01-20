@@ -11,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -56,9 +57,9 @@ public class EditSampleController {
      *
      * @return список гороов.
      */
-    private List<String> getMasNameTown(){
-        List<String> masNameTown=new ArrayList<String>();
-        for(TravelCities element: TravelCities.values()){
+    private List<String> getMasNameTown() {
+        List<String> masNameTown = new ArrayList<String>();
+        for (TravelCities element : TravelCities.values()) {
             masNameTown.add(element.getNameTown());
         }
         return masNameTown;
@@ -71,7 +72,7 @@ public class EditSampleController {
      * нужного мне вывода строки на экране.
      */
     @FXML
-    private void initialize(){
+    private void initialize() {
         comboAirbus.setItems(FXCollections.observableArrayList(Airbus.values()));
         from.setItems(FXCollections.observableArrayList(getMasNameTown()));
         from.setEditable(true);
@@ -88,6 +89,7 @@ public class EditSampleController {
                     return "";
                 }
             }
+
             @Override
             public Date fromString(String stringDate) {
                 if (stringDate != null && !stringDate.isEmpty()) {
@@ -110,23 +112,24 @@ public class EditSampleController {
      *
      * @param stage - каркас.
      */
-    public void setEditStage(Stage stage){
-        this.stage=stage;
+    public void setEditStage(Stage stage) {
+        this.stage = stage;
     }
 
     /**
      * Выводит первичные значения объекта, выбранного для редактирования.
+     *
      * @param flight объект выбранный для редактирования
      */
-    public void setEditFlight(Flight flight){
-        this.flight=flight;
+    public void setEditFlight(Flight flight) {
+        this.flight = flight;
         id.setText(Integer.toString(flight.getId()));
         comboAirbus.setValue(flight.getIdAirbus());
-        String[] dateString=converterDateToString(flight.getDeparture())[0].split("\\.");
-        int day=Integer.parseInt(dateString[0]);
-        int mouth=Integer.parseInt(dateString[1]);
-        int year=Integer.parseInt(dateString[2]);
-        datePicker.setValue(LocalDate.of(year,mouth,day));
+        String[] dateString = converterDateToString(flight.getDeparture())[0].split("\\.");
+        int day = Integer.parseInt(dateString[0]);
+        int mouth = Integer.parseInt(dateString[1]);
+        int year = Integer.parseInt(dateString[2]);
+        datePicker.setValue(LocalDate.of(year, mouth, day));
         time.setText(converterDateToString(flight.getDeparture())[1]);
         from.setValue(flight.getRoute().getPointOfDeparture());
         to.setValue(flight.getRoute().getPointOfArrival());
@@ -135,15 +138,16 @@ public class EditSampleController {
 
     /**
      * Метод преобразующий дату в массив String.
+     *
      * @param date - дата.
      * @return возвращает массив из двух значений, первое - дата, второе - время.
      */
-    private String[] converterDateToString (Date date){
-        dateFormat=new SimpleDateFormat("dd.MM.yyyy");
-        String[] masStringDate=new String[2];
-        masStringDate[0]=dateFormat.format(date);
-        SimpleDateFormat format2=new SimpleDateFormat("HH:mm");
-        masStringDate[1]=format2.format(date);
+    private String[] converterDateToString(Date date) {
+        dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        String[] masStringDate = new String[2];
+        masStringDate[0] = dateFormat.format(date);
+        SimpleDateFormat format2 = new SimpleDateFormat("HH:mm");
+        masStringDate[1] = format2.format(date);
         return masStringDate;
     }
 
@@ -161,11 +165,11 @@ public class EditSampleController {
      * @throws ParseException ошибка соединения
      */
     public void edit(ActionEvent actionEvent) throws ParseException {
-        if(inputCheck()) {
+        if (inputCheck()) {
             flight.setIdAirbus(comboAirbus.getValue());
             String dateString = datePicker.getValue().format(formatter) + " " + time.getText();
             flight.setDeparture(new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(dateString));
-            flight.setRoute(new Route(from.getValue(),to.getValue()));
+            flight.setRoute(new Route(from.getValue(), to.getValue()));
             flight.setTravelTime(Integer.parseInt(travelTimeMinutes.getText()));
             stage.close();
         }
@@ -181,7 +185,7 @@ public class EditSampleController {
         if (comboAirbus.getValue() == null) {
             errorMessage += "Невыбрано значение поля Airbus";
         }
-        if ( (datePicker.getValue() == null) || ((time.getText() == null) || (time.getText().length() == 0))) {
+        if ((datePicker.getValue() == null) || ((time.getText() == null) || (time.getText().length() == 0))) {
             errorMessage += "Невыбрано значение поля даты или времени";
         } else {
             try {
@@ -208,7 +212,7 @@ public class EditSampleController {
         if (to.getValue() == null) {
             errorMessage += "Невыбран пункт назначения";
         }
-        if (from.getValue().equals(to.getValue())){
+        if (from.getValue().equals(to.getValue())) {
             errorMessage += "Пункты отправления и назначения не должны повторяться";
         }
         if ((travelTimeMinutes.getText() == null) || (travelTimeMinutes.getText().length() == 0)) {

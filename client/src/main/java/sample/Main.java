@@ -10,6 +10,7 @@ import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import interfaceController.MainSceneController;
+
 import java.io.IOException;
 import java.net.URL;
 
@@ -56,6 +57,7 @@ public class Main extends Application {
 
     /**
      * Метод запускающий работу интерфейса.
+     *
      * @param args - параметры командной строки.
      */
     public static void main(String[] args) {
