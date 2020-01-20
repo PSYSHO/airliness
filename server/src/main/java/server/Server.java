@@ -28,8 +28,7 @@ public class Server {
         String path = property.getProperty("may.path");
         File file = new File(path);
         if (file.exists()) ;
-        else
-            journal.save(path, flightMap);
+        else journal.create();
         journal.load(path, flightMap);
         List clientList = new ArrayList<AirLinesServer>();
         try (ServerSocket server = new ServerSocket(Integer.parseInt(port))) {
