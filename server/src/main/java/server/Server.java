@@ -16,6 +16,7 @@ import java.util.*;
 public class Server {
     public static Map<Integer, Flight> flightMap;
     private static List<AirLinesServer> clientList;
+    private static  List<Thread> threadList;
 
     public Server() {
     }
@@ -56,6 +57,7 @@ public class Server {
                                 journal.save(path, flightMap);
                                 flag = false;
                                 server.close();
+                                for(Thread thread:threadList)thread.interrupt();
                             } else {
                                 System.out.println("Неизвестная команда...");
                             }
@@ -75,6 +77,7 @@ public class Server {
                     AirLinesServer client = new AirLinesServer(socketClient, flightMap);
                     Thread clientThread = new Thread(client);
                     clientThread.start();
+                    threadList.add(clientThread);
                     clientList.add(client);
                     System.out.println("Новый клиент подключен...");
                 } catch (SocketException e) {
@@ -85,7 +88,6 @@ public class Server {
             ex.printStackTrace();
         }
         System.out.println("Cервер закончил свою работу...");
-//todo сделать генераию файла в случае если его нет
     }
 
     public static void Update(Message message, Gson gson) throws IOException {
@@ -101,6 +103,3 @@ public class Server {
         }
     }
 }
-//todo сделать настройку в пом для клиента и ервера где лежат мейн классы
-// клиенты работают с своими данными сервер хранит у себя оригинал и сохраняет в конце своей работы
-
