@@ -8,6 +8,4 @@ import java.io.IOException;
 public interface ControlInterface extends Runnable {
     @Override
     void run();
-    void Update(Message message, Gson gson) throws IOException;
-
 }

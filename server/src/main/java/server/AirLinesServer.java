@@ -119,20 +119,6 @@ public class AirLinesServer implements ControlInterface {
         }
     }
 
-    @Override
-    public void Update(Message message,Gson gson) throws IOException {
-        DataOutputStream out = new DataOutputStream(Dialog.getOutputStream());
-        DataInputStream in = new DataInputStream(Dialog.getInputStream());
-        String getFlight;
-        try {
-            getFlight = gson.toJson(message);
-            out.writeUTF(getFlight);
-            out.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private List<Flight> updateFlights(Map<Integer, Flight> flightsMap) {
         List<Flight> flightsList = new ArrayList<Flight>();
         for (Map.Entry<Integer, Flight> fly : flightsMap.entrySet()) {
@@ -140,8 +126,4 @@ public class AirLinesServer implements ControlInterface {
         }
         return flightsList;
     }
-    //todo при добавлении перелета сделать обработку по Id
-    // hashmap добавить для хранения перелетов -
-    // блокировка элемента который используется
-    // сервер перед тем как клиент редактирует принимает id
 }
