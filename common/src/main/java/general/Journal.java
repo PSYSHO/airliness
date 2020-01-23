@@ -15,22 +15,6 @@ public class Journal {
 
     public Journal(){}
 
-    public List getJournal() {
-        return journal;
-    }
-
-    public void setJournal(List<Flight> journal) {
-        this.journal = journal;
-    }
-    public Flight getFlight(int index){
-        Flight  flight = (Flight) journal.get(index);
-        return flight;
-    }
-
-    public int getSize(){
-        int size  =  journal.size();
-        return size;
-    }
     public Map load(String path, Map map){
         Journal journal = new Journal();
         try {
@@ -40,24 +24,12 @@ public class Journal {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //int k = journal.getSize();
-        /*for (int i = 0; i < k; i++) {
-            List list = journal.getJournal();
-            map.put(i,list.get(i));
-        }*/
         for(Flight flight:journal.journal){
             map.put(flight.getId(),flight);
         }
         return map;
     }
-    public void delete(int index,Map map){
-        for(Object o:map.values()){
-            if (o==journal.get(index)){
-                journal.remove(index);
-                map.remove(o);
-            }
-        }
-    }
+
     public void save(String path,Map map){
         Journal journal=new Journal();
         for (Object flight : map.values()) {
@@ -78,7 +50,7 @@ public class Journal {
         Date date = new Date();
         Route route = new Route("Omsk","Omsk");
         Flight flight = new Flight(1,Airbus.Airbius_A321,route,date,50);
-        journal.journal.add(flight);
+       // journal.journal.add(flight);
         FileWriter fileWriter = null;
         try {
             fileWriter = new FileWriter("journal.json");

@@ -67,13 +67,14 @@ public class Client {
                 .registerTypeAdapter(Route.class, new CustomConverterRoute())
                 .create();
         look = new ReentrantLock();
-        thread = new Thread(new ThreadAlert(this));
+
+        thread = new Thread(this::waitingMessage);
         thread.start();
     }
 
     /**
      * Метод создающий запрос, создающий Gson объект для серелиализаци и десериализации данных
-     * и переносящий запрос в форму строки
+     *      * и переносящий запрос в форму строки
      *
      * @param message - сообщение от клиента серверу, сообщающее что нужно делать.
      * @param obj     - объект передающийся для изменеия списка на сервере.
