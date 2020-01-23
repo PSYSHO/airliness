@@ -29,9 +29,20 @@
         "pointOfDeparture": "Санкт-Петербург",
         "pointOfArrival": "Самара"
       },
-      "departure": "Jan 8, 2020, 12:00:00 PM",
+      "departure": "Jan 8, 2020, 12:30:00 PM",
       "travelTimeMinutes": 120,
-      "variability": false
+      "variability": true
+    },
+    {
+      "id": 123,
+      "idAirbus": "Airbius_A319",
+      "route": {
+        "pointOfDeparture": "Саратов",
+        "pointOfArrival": "Казань"
+      },
+      "departure": "Jan 1, 2016, 12:00:00 PM",
+      "travelTimeMinutes": 123,
+      "variability": true
     }
   ]
 }

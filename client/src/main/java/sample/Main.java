@@ -9,7 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import interfaceController.MainSceneController;
+import controllers.MainSceneController;
 
 import java.io.IOException;
 import java.net.URL;

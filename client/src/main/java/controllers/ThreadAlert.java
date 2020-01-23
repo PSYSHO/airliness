@@ -1,4 +1,4 @@
-package interfaceController;
+package controllers;
 
 import sample.Client;
 

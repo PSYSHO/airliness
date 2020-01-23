@@ -1,4 +1,4 @@
-package interfaceController;
+package controllers;
 
 import general.Airbus;
 import general.Flight;
@@ -43,6 +43,10 @@ public class MainSceneController {
 
     /** Переменная показывающая, что пользователь зашел в поиск. */
     private boolean flagSearch = false;
+
+    private List<Flight> listSearch;
+
+    private boolean flagUpdate = false;
 
     @FXML
     private Button search;
@@ -188,15 +192,25 @@ public class MainSceneController {
      */
     public  void listFlights(List<Flight> list, String message) {
         if (list != null) {
-            listFlights = list;
-            Collections.sort(listFlights);
-            if (!flagSearch)
+            if (flagSearch) {
+                if (flagUpdate){
+                    listFlights = list;
+                    Collections.sort(listFlights);
+                    flagUpdate = false;
+                    searchList();
+                } else {
+                    listSearch = list;
+                    Collections.sort(listSearch);
+                    initTableData(FXCollections.observableArrayList(listSearch));
+                }
+            } else {
+                listFlights = list;
+                Collections.sort(listFlights);
                 initTableData(FXCollections.observableArrayList(listFlights));
-            else {
-                flagSearch = false;
-                searchList();
+                flagUpdate = false;
             }
         }
+
         labelS.setText(message);
     }
 
@@ -208,6 +222,8 @@ public class MainSceneController {
      * @param id      - айди элемента который будет орабатываться
      */
     public void listUpdate(Object obj, TypeMessage message, int id) {
+        boolean exit=false;
+        flagUpdate = true;
         if (message != null) {
             Flight flight = (Flight) obj;
             switch (message) {
@@ -240,11 +256,24 @@ public class MainSceneController {
                         listFlights.remove(indexDelete);
                     }
                     break;
-                case cannotChage:
+                case cannotChange:
+                    break;
+                case quit:
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Ошибка соединения");
+                    alert.setHeaderText("Ошибка соединения");
+                    alert.setContentText("Клиент потерял соединение с сервером");
+                    alert.showAndWait();
+                    exit = true;
+                    break;
                 default:
                     break;
             }
-            listFlights(listFlights, "Рейс с ID: " + id + message.getDescription());
+            if(!exit) {
+                listFlights(listFlights, "Рейс с ID: " + id + message.getDescription());
+            } else {
+                listFlights(listFlights, "Потеряно соединение с сервером...");
+            }
         }
     }
 
@@ -296,9 +325,9 @@ public class MainSceneController {
                 client.receivingMessage(TypeMessage.addFlight, controller.getFlight(), controller.getFlight().getId());
             } catch (IOException e) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("No connection");
+                alert.setTitle("Ошибка соединения");
                 alert.setHeaderText(e.getMessage());
-                alert.setContentText("Please check your connection to the server");
+                alert.setContentText("Соединение с сервером разорванно...");
                 alert.showAndWait();
                 tableFlights.getAccessibleHelp();
             }
@@ -380,21 +409,23 @@ public class MainSceneController {
      */
     @FXML
     public void edit(ActionEvent actionEvent) throws IOException {
-        Stage editStage = new Stage();
-        FXMLLoader editLoader = new FXMLLoader();
-        editStage.setTitle(TypeMessage.editFlight.name());
-        URL editURL = getClass().getResource("/editSample.fxml");
-        editLoader.setLocation(editURL);
-        Parent root = editLoader.load();
-        Scene editScene = new Scene(root);
-        editStage.setScene(editScene);
-        editStage.initModality(Modality.APPLICATION_MODAL);
-        EditSampleController controller = editLoader.getController();
         if (tableFlights.getSelectionModel().getSelectedIndex() > -1) {
-            controller.setEditStage(editStage);
+            Stage editStage = new Stage();
+            FXMLLoader editLoader = new FXMLLoader();
+            editStage.setTitle(TypeMessage.editFlight.name());
+            URL editURL = getClass().getResource("/editSample.fxml");
+            editLoader.setLocation(editURL);
+            Parent root = editLoader.load();
+            Scene editScene = new Scene(root);
+            editStage.setScene(editScene);
+            editStage.initModality(Modality.APPLICATION_MODAL);
+            EditSampleController controller = editLoader.getController();
             Flight flightEdit = tableFlights.getSelectionModel().getSelectedItem();
+            client.receivingMessage(TypeMessage.blockElement,null,flightEdit.getId());
+            controller.setEditStage(editStage);
             controller.setEditFlight(flightEdit);
             editStage.showAndWait();
+            System.out.println("Проврка ожидания закрытия");
             client.receivingMessage(TypeMessage.editFlight, flightEdit, flightEdit.getId());
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -414,7 +445,6 @@ public class MainSceneController {
         int index = -1;
         try {
             client.receivingMessage(TypeMessage.getFlight, null, index);
-            flagSearch = false;
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("No connection");
@@ -430,7 +460,8 @@ public class MainSceneController {
      */
     @FXML
     public void getFlights(ActionEvent actionEvent) {
-        start(stage);
+        flagSearch = false;
+        listFlights(listFlights,"Список рейсов обновлены...");
     }
 
     /**
@@ -447,7 +478,7 @@ public class MainSceneController {
             String searchString = searchField.getText();
             for (Flight flight : listFlights) {
                 int i = 0; //текущее положение курсора
-                boolean flag = false; //зашел в цикл поиска
+                boolean flag; //зашел в цикл поиска
                 int lengthSearch = searchString.length();
                 int lengthFlight = flight.toString().length();
                 exit:
@@ -469,11 +500,12 @@ public class MainSceneController {
                     }
                 }
             }
+            flagSearch = true;
             if (listSearch.size() != 0) {
                 listFlights(listSearch, "Поиск по запросу " + searchString + " прошел успешно...");
-            } else
+            } else {
                 listFlights(listSearch, "Поиск по запросу " + searchString + " не нашел ни одного совпадения...");
-            flagSearch = true;
+            }
         }
     }
 

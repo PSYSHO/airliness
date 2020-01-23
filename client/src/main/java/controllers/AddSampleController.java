@@ -1,5 +1,4 @@
-package interfaceController;
-
+package controllers;
 
 import general.Airbus;
 import general.Flight;
@@ -8,37 +7,49 @@ import general.TravelCities;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.stage.Stage;
+import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
-
+/*import javax.swing.text.StringContent;
+import javax.xml.soap.Node;
+import java.awt.*;
+import java.text.DateFormat;*/
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+/*import static com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type.Node;*/
 
 /**
- * Класс-контроллер окна изменения элемента.
+ * Класс-контролер отвечающий за окно добавления нового элемента.
  *
  * @author Kashkinov Sergeu
  */
-public class EditSampleController {
+public class AddSampleController {
+    private DateTimeFormatter formatter;
     private Stage stage;
     private Flight flight;
-    private DateTimeFormatter formatter;
     private SimpleDateFormat dateFormat;
+    private List<Flight> oldFlights;
+
+    /**
+     * переменная флаг, меняется на true, только в том случае когда создалась правильный объект Flight
+     */
+    private boolean flag = false;
 
     @FXML
     private DatePicker datePicker;
 
     @FXML
-    private Label id;
+    private ComboBox<Airbus> comboAirbus;
 
     @FXML
-    private ComboBox<Airbus> comboAirbus;
+    private TextField id;
 
     @FXML
     private TextField time;
@@ -53,12 +64,19 @@ public class EditSampleController {
     private ComboBox<String> to;
 
     /**
+     * Метод возвращающий созданный объект.
+     */
+    public Flight getFlight() {
+        return flight;
+    }
+
+    /**
      * Метод возвращающий значение списка String, со значением всех возможных городов отправления.
      *
      * @return список гороов.
      */
-    private List<String> getMasNameTown() {
-        List<String> masNameTown = new ArrayList<String>();
+    private ArrayList<String> getMasNameTown() {
+        ArrayList<String> masNameTown = new ArrayList<String>();
         for (TravelCities element : TravelCities.values()) {
             masNameTown.add(element.getNameTown());
         }
@@ -108,80 +126,67 @@ public class EditSampleController {
     }
 
     /**
-     * Метод принимающий значения каркаса.
+     * Метод принимающий значения каркаса и исходного списка.
      *
-     * @param stage - каркас.
+     * @param stage      - каркас.
+     * @param oldFlights - исходный список.
      */
-    public void setEditStage(Stage stage) {
+    public void setStage(Stage stage, List<Flight> oldFlights) {
         this.stage = stage;
-    }
-
-    /**
-     * Выводит первичные значения объекта, выбранного для редактирования.
-     *
-     * @param flight объект выбранный для редактирования
-     */
-    public void setEditFlight(Flight flight) {
-        this.flight = flight;
-        id.setText(Integer.toString(flight.getId()));
-        comboAirbus.setValue(flight.getIdAirbus());
-        String[] dateString = converterDateToString(flight.getDeparture())[0].split("\\.");
-        int day = Integer.parseInt(dateString[0]);
-        int mouth = Integer.parseInt(dateString[1]);
-        int year = Integer.parseInt(dateString[2]);
-        datePicker.setValue(LocalDate.of(year, mouth, day));
-        time.setText(converterDateToString(flight.getDeparture())[1]);
-        from.setValue(flight.getRoute().getPointOfDeparture());
-        to.setValue(flight.getRoute().getPointOfArrival());
-        travelTimeMinutes.setText(Integer.toString(flight.getTravelTime()));
-    }
-
-    /**
-     * Метод преобразующий дату в массив String.
-     *
-     * @param date - дата.
-     * @return возвращает массив из двух значений, первое - дата, второе - время.
-     */
-    private String[] converterDateToString(Date date) {
-        dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-        String[] masStringDate = new String[2];
-        masStringDate[0] = dateFormat.format(date);
-        SimpleDateFormat format2 = new SimpleDateFormat("HH:mm");
-        masStringDate[1] = format2.format(date);
-        return masStringDate;
+        this.oldFlights = oldFlights;
     }
 
     /**
      * Метод вызывающий закрытие окна.
      */
-    public void cancel(ActionEvent actionEvent) {
+    public void cancel(javafx.event.ActionEvent actionEvent) {
         stage.close();
     }
 
     /**
-     * Метод изменения выбранного объекта Flight
+     * Метод создания нового объекта Flight
      *
      * @param actionEvent реакция на нажитие
      * @throws ParseException ошибка соединения
      */
-    public void edit(ActionEvent actionEvent) throws ParseException {
+    @FXML
+    public void add(ActionEvent actionEvent) throws ParseException {
+        flight = new Flight();
         if (inputCheck()) {
+            flight.setId(Integer.parseInt(id.getText()));
             flight.setIdAirbus(comboAirbus.getValue());
             String dateString = datePicker.getValue().format(formatter) + " " + time.getText();
             flight.setDeparture(new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(dateString));
             flight.setRoute(new Route(from.getValue(), to.getValue()));
             flight.setTravelTime(Integer.parseInt(travelTimeMinutes.getText()));
+            /*if(!from.getEditor().getText().equals("")){
+                fromItems.add(from.getEditor().getText());
+                System.out.println(from.getEditor().getText());
+            }*/
             stage.close();
+            flag = true;
         }
     }
 
     /**
-     * Функция проверяющая правильность ввда значений на сцене
+     * Метод проверки вводимых данных
      *
-     * @return true-без ошибокб, false-есть ошибки при вводе
+     * @return если проверка прошла успешно, то вернет true
      */
     private boolean inputCheck() {
         String errorMessage = "";
+        if ((id.getText() == null) || (id.getText().length() == 0)) {
+            errorMessage += "Незаполнено поле ID";
+        } else {
+            try {
+                if (searchId(Integer.parseInt(id.getText()))) {
+                    errorMessage += "Значение поля Id повторяется";
+                }
+            } catch (NumberFormatException e) {
+                errorMessage += "Неверный формат записи поля Id";
+            }
+        }
+
         if (comboAirbus.getValue() == null) {
             errorMessage += "Невыбрано значение поля Airbus";
         }
@@ -189,17 +194,17 @@ public class EditSampleController {
             errorMessage += "Невыбрано значение поля даты или времени";
         } else {
             try {
-                String dateTimeString = datePicker.getValue().format(formatter) + " " + time.getText();
-                Date date = new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(dateTimeString);
                 String[] timeString = time.getText().split(":");
+                String[] dateString = datePicker.getValue().format(formatter).split("\\.");
                 int hour = Integer.parseInt(timeString[0]);
                 int minute = Integer.parseInt(timeString[1]);
-                if (!((hour >= 0 && hour <= 24) && (minute >= 0 && minute <= 60)))
-                    errorMessage += "Неверно записано время";
-                String[] dateString = datePicker.getValue().format(formatter).split("\\.");
                 int day = Integer.parseInt(dateString[0]);
                 int mouth = Integer.parseInt(dateString[1]);
                 int year = Integer.parseInt(dateString[2]);
+                String dateTimeString = datePicker.getValue().format(formatter) + " " + time.getText();
+                new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(dateTimeString);
+                if (!((hour >= 0 && hour <= 24) && (minute >= 0 && minute <= 60)))
+                    errorMessage += "Неверно записано время";
                 if (!((day >= 0 && day <= 31) && (mouth >= 1 && mouth <= 12) && (year >= 1970 && year <= 3000)))
                     errorMessage += "Неверно записано дата";
             } catch (ParseException e) {
@@ -236,6 +241,26 @@ public class EditSampleController {
 
             return false;
         }
+    }
 
+    /**
+     * Поиск повторяющийхс уникальных ключей
+     */
+    public boolean searchId(int id) {
+        for (Flight flight : oldFlights) {
+            if (flight.getId() == id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Метод вызываемый контроллером, чтобы уточнить добавлять или нет созданный объект
+     *
+     * @return возвращает значение flag
+     */
+    public boolean isOnClick() {
+        return flag;
     }
 }

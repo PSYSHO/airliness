@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import general.Flight;
 import general.Journal;
+import general.TypeMessage;
+import request.GeneralMessage;
 import request.Message;
 
 import java.io.*;
@@ -14,8 +16,9 @@ import java.net.SocketException;
 import java.util.*;
 
 public class Server {
-    public static Map<Integer, Flight> flightMap;
+    private static Map<Integer, Flight> flightMap;
     private static List<AirLinesServer> clientList;
+    private static  List<Thread> threadList;
 
     public Server() {
     }
@@ -29,8 +32,10 @@ public class Server {
     }
 
     public static void main(String[] args) throws IOException {
+        int i=0;
         Journal journal = new Journal();
         flightMap = new HashMap<Integer, Flight>();
+        threadList=new ArrayList<Thread>();
         FileInputStream fil = new FileInputStream("config.properties");
         Properties property = new Properties();
         property.load(fil);
@@ -55,6 +60,9 @@ public class Server {
                                 System.out.println("Main server exiting...");
                                 journal.save(path, flightMap);
                                 flag = false;
+                                for (Thread thread : threadList) {
+                                    thread.interrupt();
+                                }
                                 server.close();
                             } else {
                                 System.out.println("Неизвестная команда...");
@@ -63,7 +71,6 @@ public class Server {
                             e.printStackTrace();
                         }
                     }
-                    System.out.println("Поток закончил свою работу...");
                 }
             });
             waitingExit.start();
@@ -74,21 +81,26 @@ public class Server {
                     Socket socketClient = server.accept();
                     AirLinesServer client = new AirLinesServer(socketClient, flightMap);
                     Thread clientThread = new Thread(client);
+                    client.initThread(clientThread);
                     clientThread.start();
+                    threadList.add(clientThread);
                     clientList.add(client);
                     System.out.println("Новый клиент подключен...");
-                } catch (SocketException e) {
-                    e.printStackTrace();
+                } finally {
+                    System.out.println("Новый клиент под номером "+i+" подключен...");
                 }
             }
-        } catch (IOException ex) {
-            ex.printStackTrace();
+
+        } catch (SocketException e){
+            System.out.println("Сервер завершает работу...");
+        }
+        catch (IOException e){
+            e.printStackTrace();
         }
         System.out.println("Cервер закончил свою работу...");
-//todo сделать генераию файла в случае если его нет
     }
 
-    public static void Update(Message message, Gson gson) throws IOException {
+    public static void update(Message message, Gson gson) throws IOException {
         for (AirLinesServer client : clientList) {
             String getFlight;
             try {
@@ -100,7 +112,23 @@ public class Server {
             }
         }
     }
+
+    public static void blockFlight(int id,AirLinesServer clientNoBlock){
+        for (AirLinesServer client : clientList) {
+            if(client.equals(clientNoBlock));
+            else {
+                client.setIntBlock(id,true);
+            }
+        }
+    }
+
+    public static void unblockFlight(int id,AirLinesServer clientNoBlock){
+        for (AirLinesServer client : clientList) {
+            if(client.equals(clientNoBlock));
+            else {
+                client.setIntBlock(id,false);
+            }
+        }
+    }
 }
-//todo сделать настройку в пом для клиента и ервера где лежат мейн классы
-// клиенты работают с своими данными сервер хранит у себя оригинал и сохраняет в конце своей работы
 

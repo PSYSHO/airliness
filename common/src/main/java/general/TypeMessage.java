@@ -8,7 +8,9 @@ public enum TypeMessage {
     deleteFlight(" удален..."),
     editFlight(" изменен..."),
     addFlight(" добавлен..."),
-    cannotChage(" нельзя изменять в данный момент..."),
+    blockElement("блокировать элемент для изменения"),
+    unblockElement("разблокировать ля изменения данный элемент"),
+    cannotChange(" нельзя изменять в данный момент..."),
     objectIsBusy(""),
     update(""),
     quit("");
